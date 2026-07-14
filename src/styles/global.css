@@ -6,7 +6,11 @@
   --text: #e6e9ef;
   --text-muted: #9aa3b2;
   --accent: #4da3ff;
+  --accent-2: #8b5cf6;
   --accent-soft: rgba(77, 163, 255, 0.12);
+  --accent-glow: rgba(77, 163, 255, 0.22);
+  --bg-glow-1: rgba(77, 163, 255, 0.14);
+  --bg-glow-2: rgba(139, 92, 246, 0.1);
   --shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
 
   color-scheme: dark;
@@ -20,7 +24,11 @@
   --text: #1a2230;
   --text-muted: #5b6675;
   --accent: #0b6fd8;
+  --accent-2: #7c3aed;
   --accent-soft: rgba(11, 111, 216, 0.08);
+  --accent-glow: rgba(11, 111, 216, 0.16);
+  --bg-glow-1: rgba(11, 111, 216, 0.08);
+  --bg-glow-2: rgba(124, 58, 237, 0.06);
   --shadow: 0 10px 30px rgba(20, 30, 50, 0.08);
 
   color-scheme: light;
@@ -31,13 +39,13 @@
 }
 
 html {
+  background: var(--bg);
   scroll-behavior: smooth;
   scroll-padding-top: 5rem;
 }
 
 body {
   margin: 0;
-  background: var(--bg);
   color: var(--text);
   font-family:
     ui-sans-serif,
@@ -51,7 +59,20 @@ body {
   font-size: 1.0625rem;
   line-height: 1.65;
   -webkit-font-smoothing: antialiased;
-  transition: background-color 0.25s ease, color 0.25s ease;
+  transition: color 0.25s ease;
+}
+
+/* Decorative color glows behind the whole page. */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(640px 420px at 85% -8%, var(--bg-glow-1), transparent 70%),
+    radial-gradient(560px 400px at -10% 24%, var(--bg-glow-2), transparent 70%),
+    radial-gradient(520px 380px at 108% 78%, var(--bg-glow-2), transparent 70%);
 }
 
 h1,
@@ -92,9 +113,20 @@ img {
   margin-bottom: 0.25rem;
 }
 
+.section-title::after {
+  content: '';
+  display: block;
+  width: 3.25rem;
+  height: 3px;
+  margin-top: 0.55rem;
+  border-radius: 2px;
+  background: linear-gradient(90deg, var(--accent), var(--accent-2));
+  box-shadow: 0 0 14px var(--accent-glow);
+}
+
 .section-subtitle {
   color: var(--text-muted);
-  margin: 0 0 2rem;
+  margin: 0.75rem 0 2rem;
 }
 
 .card {
@@ -102,11 +134,16 @@ img {
   border: 1px solid var(--border);
   border-radius: 14px;
   padding: 1.25rem 1.4rem;
-  transition: border-color 0.2s ease, transform 0.2s ease;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.25s ease,
+    transform 0.2s ease;
 }
 
 .card:hover {
-  border-color: var(--accent);
+  border-color: color-mix(in srgb, var(--accent) 55%, var(--border));
+  box-shadow: 0 6px 30px var(--accent-glow);
+  transform: translateY(-2px);
 }
 
 .chip {
@@ -116,6 +153,7 @@ img {
   letter-spacing: 0.02em;
   color: var(--accent);
   background: var(--accent-soft);
+  border: 1px solid color-mix(in srgb, var(--accent) 30%, transparent);
   border-radius: 999px;
   padding: 0.15rem 0.65rem;
 }
@@ -147,5 +185,6 @@ img {
 
   * {
     transition: none !important;
+    animation: none !important;
   }
 }

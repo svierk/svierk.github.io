@@ -2,6 +2,8 @@ export interface Article {
   title: string;
   url: string;
   date: Date;
+  /** Cover image from the article body, if present. */
+  image?: string;
 }
 
 function extractTag(xml: string, tag: string): string | undefined {
@@ -39,7 +41,9 @@ export async function fetchMediumArticles(feedUrl: string, limit = 6): Promise<A
       if (!title || !url || !pubDate) continue;
       const date = new Date(pubDate);
       if (Number.isNaN(date.getTime())) continue;
-      articles.push({ title: decodeEntities(title), url: url.split('?')[0], date });
+      const content = extractTag(item, 'content:encoded');
+      const image = content?.match(/<img[^>]+src="(https:\/\/[^"]+)"/)?.[1];
+      articles.push({ title: decodeEntities(title), url: url.split('?')[0], date, image });
     }
     return articles.slice(0, limit);
   } catch (error) {

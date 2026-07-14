@@ -31,7 +31,9 @@ const t = useTranslations(lang);
       <SocialLinks />
     </div>
   </div>
-  <Image class="portrait" src={portrait} alt={profile.name} width={280} height={280} densities={[1, 2]} loading="eager" />
+  <div class="portrait-wrap">
+    <Image class="portrait" src={portrait} alt={profile.name} width={280} height={280} densities={[1, 2]} loading="eager" />
+  </div>
 </section>
 
 <style>
@@ -56,6 +58,10 @@ const t = useTranslations(lang);
   h1 {
     font-size: clamp(2.4rem, 6vw, 3.6rem);
     margin-bottom: 0.35rem;
+    background: linear-gradient(105deg, var(--text) 45%, var(--accent) 85%, var(--accent-2) 110%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
   }
 
   .role {
@@ -85,12 +91,28 @@ const t = useTranslations(lang);
     font-size: 0.95rem;
   }
 
-  .portrait {
+  .portrait-wrap {
+    position: relative;
     flex-shrink: 0;
+  }
+
+  /* Soft color glow behind the portrait. */
+  .portrait-wrap::before {
+    content: '';
+    position: absolute;
+    inset: -14px;
+    border-radius: 40px;
+    background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    filter: blur(34px);
+    opacity: 0.4;
+  }
+
+  .portrait {
+    position: relative;
     width: clamp(180px, 22vw, 280px);
     height: auto;
     border-radius: 28px;
-    border: 1px solid var(--border);
+    border: 1px solid color-mix(in srgb, var(--accent) 35%, var(--border));
     box-shadow: var(--shadow);
   }
 

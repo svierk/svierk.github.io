@@ -30,8 +30,6 @@ const articles = await fetchMediumArticles(profile.mediumFeed);
 const today = new Date().toISOString().slice(0, 10);
 const isUpcoming = (talk: (typeof talks)[number]) => (talk.dateEnd ?? talk.date) >= today;
 const sortedTalks = [...talks].sort((a, b) => b.date.localeCompare(a.date));
-const upcomingTalks = sortedTalks.filter(isUpcoming);
-const pastTalks = sortedTalks.filter((talk) => !isUpcoming(talk));
 ---
 
 <Base {lang}>
@@ -44,24 +42,15 @@ const pastTalks = sortedTalks.filter((talk) => !isUpcoming(talk));
     </Section>
 
     <Section id="speaking" title={t('speaking.title')} subtitle={t('speaking.subtitle')}>
-      {
-        upcomingTalks.length > 0 && (
-          <div class="talk-group">
-            {upcomingTalks.map((talk) => (
-              <TalkCard {talk} {lang} upcoming />
-            ))}
-          </div>
-        )
-      }
-      {
-        pastTalks.length > 0 && (
-          <div class="talk-group">
-            {pastTalks.map((talk) => (
-              <TalkCard {talk} {lang} upcoming={false} />
-            ))}
-          </div>
-        )
-      }
+      <ol class="timeline">
+        {
+          sortedTalks.map((talk) => (
+            <li class:list={{ upcoming: isUpcoming(talk) }}>
+              <TalkCard {talk} {lang} upcoming={isUpcoming(talk)} />
+            </li>
+          ))
+        }
+      </ol>
       <p class="muted meetups">{t('speaking.meetups')}</p>
     </Section>
 
@@ -93,14 +82,60 @@ const pastTalks = sortedTalks.filter((talk) => !isUpcoming(talk));
     margin: 0;
   }
 
-  .talk-group {
+  .timeline {
+    list-style: none;
+    position: relative;
+    margin: 0;
+    padding: 0 0 0 2rem;
     display: flex;
     flex-direction: column;
     gap: 0.9rem;
   }
 
-  .talk-group + .talk-group {
-    margin-top: 0.9rem;
+  /* Vertical gradient line connecting the events. */
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: 0.45rem;
+    top: 1.5rem;
+    bottom: 1.5rem;
+    width: 2px;
+    border-radius: 2px;
+    background: linear-gradient(180deg, var(--accent), var(--accent-2) 60%, transparent);
+    opacity: 0.4;
+  }
+
+  .timeline > li {
+    position: relative;
+  }
+
+  /* Glowing dot per event. */
+  .timeline > li::before {
+    content: '';
+    position: absolute;
+    left: -1.98rem;
+    top: 1.55rem;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--accent-2);
+    box-shadow: 0 0 10px var(--accent-glow);
+  }
+
+  .timeline > li.upcoming::before {
+    background: var(--accent);
+    box-shadow: 0 0 0 4px var(--accent-soft), 0 0 14px var(--accent);
+    animation: pulse 2.4s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%,
+    100% {
+      box-shadow: 0 0 0 4px var(--accent-soft), 0 0 10px var(--accent);
+    }
+    50% {
+      box-shadow: 0 0 0 7px var(--accent-soft), 0 0 20px var(--accent);
+    }
   }
 
   .meetups {

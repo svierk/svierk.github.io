@@ -19,7 +19,7 @@ const dateLabel = end
   : formatDate(start, lang);
 ---
 
-<article class="card talk">
+<article class:list={['card', 'talk', { upcoming }]}>
   <div class="head">
     <h3>
       {talk.url ? (
@@ -32,7 +32,9 @@ const dateLabel = end
     </h3>
     {upcoming && <span class="chip">{t('speaking.upcoming')}</span>}
   </div>
-  <p class="muted meta">{dateLabel} · {talk.location}</p>
+  <p class="muted meta">
+    {dateLabel} · <span class="flag" aria-hidden="true">{talk.flag}</span> {talk.location}
+  </p>
   {
     talk.comingSoon ? (
       <p class="session muted">{t('speaking.comingSoon')}</p>
@@ -61,6 +63,15 @@ const dateLabel = end
     display: flex;
     flex-direction: column;
     gap: 0.2rem;
+  }
+
+  .talk.upcoming {
+    border-color: color-mix(in srgb, var(--accent) 45%, var(--border));
+    box-shadow: 0 0 26px var(--accent-glow);
+  }
+
+  .flag {
+    font-size: 1rem;
   }
 
   .head {
