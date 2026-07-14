@@ -1,0 +1,110 @@
+---
+import { Image } from 'astro:assets';
+import portrait from '../assets/portrait.jpg';
+import { profile } from '../data/profile';
+import type { Lang } from '../i18n/ui';
+import { useTranslations } from '../i18n/utils';
+import SocialLinks from './SocialLinks.astro';
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+---
+
+<section class="hero container">
+  <div class="text">
+    <p class="greeting">{t('hero.greeting')}</p>
+    <h1>{profile.name}</h1>
+    <p class="role">{t('hero.role')}</p>
+    <p class="tagline">{t('hero.tagline')}</p>
+    <div class="meta">
+      <span class="location muted">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"></path>
+          <circle cx="12" cy="10" r="3"></circle>
+        </svg>
+        {t('hero.location')}
+      </span>
+      <SocialLinks />
+    </div>
+  </div>
+  <Image class="portrait" src={portrait} alt={profile.name} width={280} height={280} densities={[1, 2]} loading="eager" />
+</section>
+
+<style>
+  .hero {
+    display: flex;
+    align-items: center;
+    gap: 3rem;
+    padding-top: 6rem;
+    padding-bottom: 1.5rem;
+  }
+
+  .text {
+    flex: 1;
+  }
+
+  .greeting {
+    color: var(--accent);
+    font-weight: 600;
+    margin: 0 0 0.5rem;
+  }
+
+  h1 {
+    font-size: clamp(2.4rem, 6vw, 3.6rem);
+    margin-bottom: 0.35rem;
+  }
+
+  .role {
+    font-size: 1.15rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    margin: 0 0 1.25rem;
+  }
+
+  .tagline {
+    max-width: 40rem;
+    font-size: 1.15rem;
+    margin: 0 0 1.75rem;
+  }
+
+  .meta {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+  }
+
+  .location {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.95rem;
+  }
+
+  .portrait {
+    flex-shrink: 0;
+    width: clamp(180px, 22vw, 280px);
+    height: auto;
+    border-radius: 28px;
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow);
+  }
+
+  @media (max-width: 720px) {
+    .hero {
+      flex-direction: column-reverse;
+      align-items: flex-start;
+      gap: 2rem;
+      padding-top: 3.5rem;
+    }
+
+    .portrait {
+      width: 160px;
+      border-radius: 22px;
+    }
+  }
+</style>

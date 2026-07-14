@@ -1,0 +1,43 @@
+---
+import { profile } from '../data/profile';
+import type { Lang } from '../i18n/ui';
+import { useTranslations } from '../i18n/utils';
+import SocialLinks from './SocialLinks.astro';
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+const year = new Date().getFullYear();
+---
+
+<footer>
+  <div class="container inner">
+    <p class="muted">© {year} {profile.name} · {t('footer.builtWith')}</p>
+    <SocialLinks size={18} />
+  </div>
+</footer>
+
+<style>
+  footer {
+    margin-top: 5rem;
+    border-top: 1px solid var(--border);
+  }
+
+  .inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+    padding-top: 1.5rem;
+    padding-bottom: 1.5rem;
+  }
+
+  p {
+    margin: 0;
+    font-size: 0.9rem;
+  }
+</style>

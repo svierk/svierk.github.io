@@ -1,0 +1,96 @@
+---
+import type { Article } from '../lib/medium';
+import type { Lang } from '../i18n/ui';
+import { formatDate, useTranslations } from '../i18n/utils';
+
+interface Props {
+  articles: Article[];
+  mediumUrl: string;
+  lang: Lang;
+}
+
+const { articles, mediumUrl, lang } = Astro.props;
+const t = useTranslations(lang);
+---
+
+{
+  articles.length > 0 ? (
+    <>
+      <ul class="articles">
+        {articles.map((article) => (
+          <li class="card">
+            <a href={article.url} target="_blank" rel="noopener noreferrer">
+              <span class="title">{article.title}</span>
+              <time class="muted" datetime={article.date.toISOString()}>
+                {formatDate(article.date, lang)}
+              </time>
+            </a>
+          </li>
+        ))}
+      </ul>
+      <p class="view-all">
+        <a href={mediumUrl} target="_blank" rel="noopener noreferrer">
+          {t('blog.viewAll')} →
+        </a>
+      </p>
+    </>
+  ) : (
+    <p>
+      <a href={mediumUrl} target="_blank" rel="noopener noreferrer">
+        {t('blog.fallback')} →
+      </a>
+    </p>
+  )
+}
+
+<style>
+  .articles {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .articles .card {
+    padding: 0;
+  }
+
+  .articles a {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.95rem 1.4rem;
+    color: var(--text);
+  }
+
+  .articles a:hover {
+    text-decoration: none;
+  }
+
+  .articles a:hover .title {
+    color: var(--accent);
+  }
+
+  .title {
+    font-weight: 600;
+  }
+
+  time {
+    font-size: 0.88rem;
+    white-space: nowrap;
+  }
+
+  .view-all {
+    margin-top: 1.25rem;
+  }
+
+  @media (max-width: 720px) {
+    .articles a {
+      flex-direction: column;
+      gap: 0.15rem;
+    }
+  }
+</style>

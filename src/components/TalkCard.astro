@@ -1,0 +1,110 @@
+---
+import type { Talk } from '../data/talks';
+import type { Lang } from '../i18n/ui';
+import { formatDate, useTranslations } from '../i18n/utils';
+
+interface Props {
+  talk: Talk;
+  lang: Lang;
+  upcoming: boolean;
+}
+
+const { talk, lang, upcoming } = Astro.props;
+const t = useTranslations(lang);
+
+const start = new Date(talk.date);
+const end = talk.dateEnd ? new Date(talk.dateEnd) : undefined;
+const dateLabel = end
+  ? `${formatDate(start, lang, { day: 'numeric', month: 'long', year: undefined })} – ${formatDate(end, lang)}`
+  : formatDate(start, lang);
+---
+
+<article class="card talk">
+  <div class="head">
+    <h3>
+      {talk.url ? (
+        <a href={talk.url} target="_blank" rel="noopener noreferrer">
+          {talk.event}
+        </a>
+      ) : (
+        talk.event
+      )}
+    </h3>
+    {upcoming && <span class="chip">{t('speaking.upcoming')}</span>}
+  </div>
+  <p class="muted meta">{dateLabel} · {talk.location}</p>
+  {
+    talk.comingSoon ? (
+      <p class="session muted">{t('speaking.comingSoon')}</p>
+    ) : (
+      <ul class="sessions">
+        {talk.sessions.map((session) => {
+          const slides = talk.slides?.find((s) => s.session === session);
+          return (
+            <li>
+              “{session}”
+              {slides && (
+                <a class="slides" href={slides.href} target="_blank" rel="noopener noreferrer">
+                  [{t('speaking.slides')}]
+                </a>
+              )}
+            </li>
+          );
+        })}
+      </ul>
+    )
+  }
+</article>
+
+<style>
+  .talk {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+  }
+
+  .head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.75rem;
+  }
+
+  h3 {
+    font-size: 1.12rem;
+    margin: 0;
+  }
+
+  h3 a {
+    color: var(--text);
+  }
+
+  h3 a:hover {
+    color: var(--accent);
+    text-decoration: none;
+  }
+
+  .meta {
+    font-size: 0.9rem;
+    margin: 0;
+  }
+
+  .sessions {
+    list-style: none;
+    margin: 0.35rem 0 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .session {
+    margin: 0.35rem 0 0;
+    font-style: italic;
+  }
+
+  .slides {
+    margin-left: 0.35rem;
+    font-size: 0.9rem;
+  }
+</style>

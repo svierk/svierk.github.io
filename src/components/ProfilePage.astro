@@ -1,0 +1,114 @@
+---
+import ArticleList from './ArticleList.astro';
+import Footer from './Footer.astro';
+import Hero from './Hero.astro';
+import Nav from './Nav.astro';
+import ProjectCard from './ProjectCard.astro';
+import Section from './Section.astro';
+import TalkCard from './TalkCard.astro';
+import VideoCard from './VideoCard.astro';
+import Base from '../layouts/Base.astro';
+import { profile } from '../data/profile';
+import { githubProfileUrl, projects } from '../data/projects';
+import { liveSessions } from '../data/sessions';
+import { talks } from '../data/talks';
+import type { Lang } from '../i18n/ui';
+import { useTranslations } from '../i18n/utils';
+import { fetchMediumArticles } from '../lib/medium';
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+
+const articles = await fetchMediumArticles(profile.mediumFeed);
+
+// The upcoming/past split is evaluated at build time; the weekly scheduled
+// rebuild keeps it (and the article list) fresh without manual updates.
+const today = new Date().toISOString().slice(0, 10);
+const isUpcoming = (talk: (typeof talks)[number]) => (talk.dateEnd ?? talk.date) >= today;
+const sortedTalks = [...talks].sort((a, b) => b.date.localeCompare(a.date));
+const upcomingTalks = sortedTalks.filter(isUpcoming);
+const pastTalks = sortedTalks.filter((talk) => !isUpcoming(talk));
+---
+
+<Base {lang}>
+  <Nav {lang} />
+  <main>
+    <Hero {lang} />
+
+    <Section id="about" title={t('about.title')}>
+      <p class="about-body">{t('about.body')}</p>
+    </Section>
+
+    <Section id="speaking" title={t('speaking.title')} subtitle={t('speaking.subtitle')}>
+      {
+        upcomingTalks.length > 0 && (
+          <div class="talk-group">
+            {upcomingTalks.map((talk) => (
+              <TalkCard {talk} {lang} upcoming />
+            ))}
+          </div>
+        )
+      }
+      {
+        pastTalks.length > 0 && (
+          <div class="talk-group">
+            {pastTalks.map((talk) => (
+              <TalkCard {talk} {lang} upcoming={false} />
+            ))}
+          </div>
+        )
+      }
+      <p class="muted meetups">{t('speaking.meetups')}</p>
+    </Section>
+
+    <Section id="sessions" title={t('sessions.title')} subtitle={t('sessions.subtitle')}>
+      <div class="grid-2">
+        {liveSessions.map((session) => <VideoCard {session} {lang} />)}
+      </div>
+    </Section>
+
+    <Section id="blog" title={t('blog.title')} subtitle={t('blog.subtitle')}>
+      <ArticleList {articles} {lang} mediumUrl="https://medium.com/@svierk" />
+    </Section>
+
+    <Section id="opensource" title={t('opensource.title')} subtitle={t('opensource.subtitle')}>
+      <div class="grid-2">
+        {projects.map((project) => <ProjectCard {project} {lang} />)}
+      </div>
+      <p class="view-all">
+        <a href={githubProfileUrl} target="_blank" rel="noopener noreferrer">{t('opensource.viewAll')} →</a>
+      </p>
+    </Section>
+  </main>
+  <Footer {lang} />
+</Base>
+
+<style>
+  .about-body {
+    max-width: 46rem;
+    margin: 0;
+  }
+
+  .talk-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.9rem;
+  }
+
+  .talk-group + .talk-group {
+    margin-top: 0.9rem;
+  }
+
+  .meetups {
+    margin-top: 1.25rem;
+    font-size: 0.95rem;
+  }
+
+  .view-all {
+    margin-top: 1.25rem;
+  }
+</style>
