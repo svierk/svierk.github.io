@@ -10,7 +10,7 @@ export const defaultLang: Lang = 'en';
 export const ui = {
   en: {
     'meta.description':
-      'Sebastiano Schwarz — Salesforce CTO Germany @ Capgemini | Technical Architect. Speaker, open source author and technical writer.',
+      'Sebastiano Schwarz - Salesforce CTO Germany @ Capgemini | Technical Architect. Speaker, open source author and technical writer.',
     'nav.about': 'About',
     'nav.speaking': 'Speaking',
     'nav.sessions': 'Sessions',
@@ -19,11 +19,11 @@ export const ui = {
     'hero.greeting': "Hi, I'm",
     'hero.role': 'Salesforce CTO Germany @ Capgemini · Technical Architect',
     'hero.tagline':
-      'I help teams build great things on the Salesforce platform — and share what I learn along the way as a speaker, open source author and technical writer.',
+      'I help teams build great things on the Salesforce platform - and share what I learn along the way as a speaker, open source author and technical writer.',
     'hero.location': 'Hamburg, Germany',
     'about.title': 'About',
     'about.body':
-      'I am a Technical Architect and Salesforce Trailblazer with a passion for JavaScript and TypeScript. As Salesforce CTO Germany at Capgemini I shape technical strategy and architecture for enterprise Salesforce implementations. My focus areas are Lightning Web Components, DevOps and test automation, scalable multi-org architectures and, more recently, everything around Agentforce and AI. I love giving back to the community — on stage, on GitHub and on Medium.',
+      'I am a Technical Architect and Salesforce Trailblazer with a passion for JavaScript and TypeScript. As Salesforce CTO Germany at Capgemini I shape technical strategy and architecture for enterprise Salesforce implementations. My focus areas are Lightning Web Components, DevOps and test automation, scalable multi-org architectures and, more recently, everything around Agentforce and AI. I love giving back to the community - on stage, on GitHub and on Medium.',
     'speaking.title': 'Speaking',
     'speaking.subtitle': 'Conference talks and community sessions.',
     'speaking.upcoming': 'Upcoming',
@@ -33,7 +33,7 @@ export const ui = {
       'Plus multiple local Trailblazer Community Group meet-ups.',
     'speaking.slides': 'Slides',
     'sessions.title': 'Live Sessions',
-    'sessions.subtitle': 'Recorded live sessions — grab a coffee and watch.',
+    'sessions.subtitle': 'Recorded live sessions - grab a coffee and watch.',
     'sessions.watch': 'Watch on YouTube',
     'blog.title': 'Blog',
     'blog.subtitle': 'Latest articles, automatically pulled from Medium.',
@@ -48,7 +48,7 @@ export const ui = {
   },
   de: {
     'meta.description':
-      'Sebastiano Schwarz — Salesforce CTO Germany @ Capgemini | Technical Architect. Speaker, Open-Source-Autor und Technical Writer.',
+      'Sebastiano Schwarz - Salesforce CTO Germany @ Capgemini | Technical Architect. Speaker, Open-Source-Autor und Technical Writer.',
     'nav.about': 'Über mich',
     'nav.speaking': 'Vorträge',
     'nav.sessions': 'Sessions',
@@ -57,11 +57,11 @@ export const ui = {
     'hero.greeting': 'Hi, ich bin',
     'hero.role': 'Salesforce CTO Germany @ Capgemini · Technical Architect',
     'hero.tagline':
-      'Ich helfe Teams, großartige Lösungen auf der Salesforce-Plattform zu bauen — und teile mein Wissen als Speaker, Open-Source-Autor und Technical Writer.',
+      'Ich helfe Teams, großartige Lösungen auf der Salesforce-Plattform zu bauen - und teile mein Wissen als Speaker, Open-Source-Autor und Technical Writer.',
     'hero.location': 'Hamburg, Deutschland',
     'about.title': 'Über mich',
     'about.body':
-      'Ich bin Technical Architect und Salesforce Trailblazer mit einer Leidenschaft für JavaScript und TypeScript. Als Salesforce CTO Germany bei Capgemini gestalte ich technische Strategie und Architektur für Enterprise-Salesforce-Implementierungen. Meine Schwerpunkte sind Lightning Web Components, DevOps und Testautomatisierung, skalierbare Multi-Org-Architekturen und zuletzt alles rund um Agentforce und KI. Ich gebe gerne an die Community zurück — auf der Bühne, auf GitHub und auf Medium.',
+      'Ich bin Technical Architect und Salesforce Trailblazer mit einer Leidenschaft für JavaScript und TypeScript. Als Salesforce CTO Germany bei Capgemini gestalte ich technische Strategie und Architektur für Enterprise-Salesforce-Implementierungen. Meine Schwerpunkte sind Lightning Web Components, DevOps und Testautomatisierung, skalierbare Multi-Org-Architekturen und zuletzt alles rund um Agentforce und KI. Ich gebe gerne an die Community zurück - auf der Bühne, auf GitHub und auf Medium.',
     'speaking.title': 'Vorträge',
     'speaking.subtitle': 'Konferenz-Talks und Community-Sessions.',
     'speaking.upcoming': 'Demnächst',
@@ -72,7 +72,7 @@ export const ui = {
     'speaking.slides': 'Slides',
     'sessions.title': 'Live Sessions',
     'sessions.subtitle':
-      'Aufgezeichnete Live-Sessions — Kaffee schnappen und reinschauen.',
+      'Aufgezeichnete Live-Sessions - Kaffee schnappen und reinschauen.',
     'sessions.watch': 'Auf YouTube ansehen',
     'blog.title': 'Blog',
     'blog.subtitle': 'Neueste Artikel, automatisch von Medium geladen.',

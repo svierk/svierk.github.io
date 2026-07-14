@@ -39,7 +39,7 @@ export const talks: Talk[] = [
     event: "WirSindOhana '26",
     date: '2026-05-08',
     location: 'Kosmos, Berlin, Germany',
-    sessions: ['Anti-Patterns in Agentforce — 5 Mistakes That Look Like Best Practices'],
+    sessions: ['Anti-Patterns in Agentforce - 5 Mistakes That Look Like Best Practices'],
     url: 'https://wirsindohana.de/',
   },
   {

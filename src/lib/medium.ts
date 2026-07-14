@@ -21,7 +21,7 @@ function decodeEntities(text: string): string {
 
 /**
  * Fetches the latest articles from a Medium RSS feed at build time.
- * Returns an empty list on any failure so the build never breaks —
+ * Returns an empty list on any failure so the build never breaks -
  * the blog section then falls back to a plain Medium link.
  */
 export async function fetchMediumArticles(feedUrl: string, limit = 6): Promise<Article[]> {

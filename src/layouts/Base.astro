@@ -11,7 +11,7 @@ interface Props {
 
 const { lang } = Astro.props;
 const t = useTranslations(lang);
-const title = `${profile.name} — Salesforce CTO Germany @ Capgemini`;
+const title = `${profile.name} - Salesforce CTO Germany @ Capgemini`;
 const description = t('meta.description');
 const canonical = new URL(lang === 'en' ? '/' : '/de/', Astro.site);
 ---

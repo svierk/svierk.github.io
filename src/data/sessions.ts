@@ -36,8 +36,8 @@ export const liveSessions: LiveSession[] = [
     host: 'Apex Hours',
     date: '2024-11-26',
     description: {
-      en: 'Using the GraphQL wire adapter to simplify the data layer of Lightning Web Components — often without any Apex.',
-      de: 'Mit dem GraphQL Wire Adapter die Datenschicht von Lightning Web Components vereinfachen — oft ganz ohne Apex.',
+      en: 'Using the GraphQL wire adapter to simplify the data layer of Lightning Web Components - often without any Apex.',
+      de: 'Mit dem GraphQL Wire Adapter die Datenschicht von Lightning Web Components vereinfachen - oft ganz ohne Apex.',
     },
   },
   {
@@ -46,8 +46,8 @@ export const liveSessions: LiveSession[] = [
     host: 'Apex Hours',
     date: '2024-07-27',
     description: {
-      en: 'Practical LWC lessons learned — from component design to testing — that make everyday development easier.',
-      de: 'Praktische LWC-Lektionen — von Komponentendesign bis Testing — die die tägliche Entwicklung leichter machen.',
+      en: 'Practical LWC lessons learned - from component design to testing - that make everyday development easier.',
+      de: 'Praktische LWC-Lektionen - von Komponentendesign bis Testing - die die tägliche Entwicklung leichter machen.',
     },
   },
 ];

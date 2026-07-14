@@ -1,6 +1,6 @@
 # svierk.github.io
 
-Personal profile & track record of Sebastiano Schwarz — live at [svierk.github.io](https://svierk.github.io/).
+Personal profile & track record of Sebastiano Schwarz - live at [svierk.github.io](https://svierk.github.io/).
 
 Built with [Astro](https://astro.build/), deployed to GitHub Pages via GitHub Actions.
 Available in English (default, `/`) and German (`/de/`).
