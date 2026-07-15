@@ -10,7 +10,7 @@ export const defaultLang: Lang = 'en';
 export const ui = {
   en: {
     'meta.description':
-      'Sebastiano Schwarz - Salesforce CTO Germany @ Capgemini | Technical Architect. Speaker, open source author and technical writer.',
+      'Sebastiano Schwarz - Salesforce CTO Germany @ Capgemini. Shaping technical strategy around the Salesforce platform. Speaker, open source contributor and technical author.',
     'nav.about': 'About',
     'nav.speaking': 'Speaking',
     'nav.sessions': 'Sessions',
@@ -19,11 +19,11 @@ export const ui = {
     'hero.greeting': "Hi, I'm",
     'hero.role': 'Salesforce CTO Germany @ Capgemini · Technical Architect',
     'hero.tagline':
-      'I help teams build great things on the Salesforce platform - and share what I learn along the way as a speaker, open source author and technical writer.',
+      'I shape the technical strategy around the Salesforce platform - and share what I learn along the way as a speaker, open source contributor and technical author.',
     'hero.location': 'Hamburg, Germany',
     'about.title': 'About',
     'about.body':
-      'I am a Technical Architect and Salesforce Trailblazer with a passion for JavaScript and TypeScript. As Salesforce CTO Germany at Capgemini I shape technical strategy and architecture for enterprise Salesforce implementations. My focus areas are Lightning Web Components, DevOps and test automation, scalable multi-org architectures and, more recently, everything around Agentforce and AI. I love giving back to the community - on stage, on GitHub and on Medium.',
+      'As Salesforce CTO Germany at Capgemini, I shape the technical strategy around the platform while staying hands-on as Lead Delivery Architect for global enterprise projects. My focus spans scalable multi-org architectures, DevOps strategy, UI architecture and, more recently, everything around Agentforce and AI. Alongside that, I mentor aspiring architects, contribute to open source, speak at conferences and write about what I learn along the way.',
     'speaking.title': 'Speaking',
     'speaking.subtitle': 'Conference talks and community sessions.',
     'speaking.upcoming': 'Upcoming',
@@ -50,7 +50,7 @@ export const ui = {
   },
   de: {
     'meta.description':
-      'Sebastiano Schwarz - Salesforce CTO Germany @ Capgemini | Technical Architect. Speaker, Open-Source-Autor und Technical Writer.',
+      'Sebastiano Schwarz - Salesforce CTO Germany @ Capgemini. Gestaltet die technische Strategie rund um die Salesforce-Plattform. Speaker, Open-Source-Contributor und technischer Autor.',
     'nav.about': 'Über mich',
     'nav.speaking': 'Vorträge',
     'nav.sessions': 'Sessions',
@@ -59,11 +59,11 @@ export const ui = {
     'hero.greeting': 'Hi, ich bin',
     'hero.role': 'Salesforce CTO Germany @ Capgemini · Technical Architect',
     'hero.tagline':
-      'Ich helfe Teams, großartige Lösungen auf der Salesforce-Plattform zu bauen - und teile mein Wissen als Speaker, Open-Source-Autor und Technical Writer.',
+      'Ich gestalte die technische Strategie rund um die Salesforce-Plattform - und teile mein Wissen als Speaker, Open-Source-Contributor und technischer Autor.',
     'hero.location': 'Hamburg, Deutschland',
     'about.title': 'Über mich',
     'about.body':
-      'Ich bin Technical Architect und Salesforce Trailblazer mit einer Leidenschaft für JavaScript und TypeScript. Als Salesforce CTO Germany bei Capgemini gestalte ich technische Strategie und Architektur für Enterprise-Salesforce-Implementierungen. Meine Schwerpunkte sind Lightning Web Components, DevOps und Testautomatisierung, skalierbare Multi-Org-Architekturen und zuletzt alles rund um Agentforce und KI. Ich gebe gerne an die Community zurück - auf der Bühne, auf GitHub und auf Medium.',
+      'Als Salesforce CTO Germany bei Capgemini gestalte ich die technische Strategie rund um die Plattform – bleibe dabei aber als Lead Delivery Architect für globale Enterprise-Kunden nah an der Umsetzung. Meine Schwerpunkte reichen von skalierbaren Multi-Org-Architekturen über DevOps-Strategie und UI-Architektur bis hin zu allem rund um Agentforce und KI. Daneben begleite ich angehende Architektinnen und Architekten als Mentor, engagiere mich in Open Source, spreche auf Konferenzen und schreibe über das, was ich dabei lerne.',
     'speaking.title': 'Vorträge',
     'speaking.subtitle': 'Konferenz-Talks und Community-Sessions.',
     'speaking.upcoming': 'Demnächst',
