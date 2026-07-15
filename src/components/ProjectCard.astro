@@ -6,9 +6,11 @@ import { useTranslations } from '../i18n/utils';
 interface Props {
   project: Project;
   lang: Lang;
+  /** Live star count from the GitHub API; falls back to the static snapshot. */
+  stars?: number;
 }
 
-const { project, lang } = Astro.props;
+const { project, lang, stars = project.stars } = Astro.props;
 const t = useTranslations(lang);
 const url = `https://github.com/svierk/${project.repo}`;
 ---
@@ -18,11 +20,11 @@ const url = `https://github.com/svierk/${project.repo}`;
     <h3>
       <a href={url} target="_blank" rel="noopener noreferrer">{project.repo}</a>
     </h3>
-    <span class="stars muted" title={`${project.stars} ${t('opensource.stars')}`}>
+    <span class="stars muted" title={`${stars} ${t('opensource.stars')}`}>
       <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
         <path d="m12 17.27 6.18 3.73-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21 12 17.27Z" />
       </svg>
-      {project.stars}
+      {stars}
     </span>
   </div>
   <p class="description">{project.description[lang]}</p>

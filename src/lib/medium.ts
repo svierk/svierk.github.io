@@ -26,7 +26,15 @@ function decodeEntities(text: string): string {
  * Returns an empty list on any failure so the build never breaks -
  * the blog section then falls back to a plain Medium link.
  */
-export async function fetchMediumArticles(feedUrl: string, limit = 6): Promise<Article[]> {
+let cached: Promise<Article[]> | undefined;
+
+export function fetchMediumArticles(feedUrl: string, limit = 6): Promise<Article[]> {
+  // Both language pages request the same feed; fetch only once per build.
+  cached ??= doFetchMediumArticles(feedUrl, limit);
+  return cached;
+}
+
+async function doFetchMediumArticles(feedUrl: string, limit: number): Promise<Article[]> {
   try {
     const response = await fetch(feedUrl, { signal: AbortSignal.timeout(15000) });
     if (!response.ok) throw new Error(`Feed responded with ${response.status}`);

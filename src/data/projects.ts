@@ -2,7 +2,7 @@ import type { Lang } from '../i18n/ui';
 
 export interface Project {
   repo: string;
-  /** Star count is a static snapshot, refreshed occasionally. */
+  /** Static fallback star count, used when the GitHub API is unavailable at build time. */
   stars: number;
   description: Record<Lang, string>;
   topics: string[];

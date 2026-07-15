@@ -14,6 +14,7 @@ import { liveSessions } from '../data/sessions';
 import { talks } from '../data/talks';
 import type { Lang } from '../i18n/ui';
 import { useTranslations } from '../i18n/utils';
+import { fetchStarCounts } from '../lib/github';
 import { fetchMediumArticles } from '../lib/medium';
 
 interface Props {
@@ -24,6 +25,7 @@ const { lang } = Astro.props;
 const t = useTranslations(lang);
 
 const articles = await fetchMediumArticles(profile.mediumFeed);
+const starCounts = await fetchStarCounts(projects.map((project) => project.repo));
 
 // The upcoming/past split is evaluated at build time; the weekly scheduled
 // rebuild keeps it (and the article list) fresh without manual updates.
@@ -66,7 +68,7 @@ const sortedTalks = [...talks].sort((a, b) => b.date.localeCompare(a.date));
 
     <Section id="opensource" title={t('opensource.title')} subtitle={t('opensource.subtitle')}>
       <div class="grid-2">
-        {projects.map((project) => <ProjectCard {project} {lang} />)}
+        {projects.map((project) => <ProjectCard {project} {lang} stars={starCounts[project.repo]} />)}
       </div>
       <p class="view-all">
         <a href={githubProfileUrl} target="_blank" rel="noopener noreferrer">{t('opensource.viewAll')} →</a>
