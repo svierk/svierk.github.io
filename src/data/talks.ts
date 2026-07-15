@@ -5,6 +5,8 @@ export interface TalkSession {
   repo?: string;
   /** PDF slide deck, served from /public (e.g. '/slides/tdx-25-utam.pdf'). */
   slides?: string;
+  /** Related blog article. */
+  article?: string;
 }
 
 export interface Talk {
@@ -59,6 +61,8 @@ export const talks: Talk[] = [
       {
         title: 'Anti-Patterns in Agentforce - 5 Mistakes That Look Like Best Practices',
         repo: 'https://github.com/rammc/agentforce-grounding-demo',
+        article:
+          'https://medium.com/capgemini-salesforce-architects/i-built-a-custom-vector-search-to-beat-salesforce-data-library-dc0dbd335576',
       },
     ],
     url: 'https://wirsindohana.de/',
@@ -73,6 +77,8 @@ export const talks: Talk[] = [
       {
         title: 'Diagnose a Monolithic Salesforce Org with Scale Center',
         repo: 'https://github.com/rammc/orgpulse',
+        article:
+          'https://medium.com/capgemini-salesforce-architects/when-scale-center-tells-you-whats-wrong-but-not-what-to-do-9cd3417637fb',
       },
     ],
     url: 'https://dreamin.al/',
@@ -130,6 +136,8 @@ export const talks: Talk[] = [
       {
         title: 'Streamline Salesforce E2E UI Testing with UTAM',
         repo: 'https://github.com/svierk/salesforce-utam-e2e-testing',
+        article:
+          'https://medium.com/capgemini-salesforce-architects/streamline-e2e-testing-with-utam-salesforces-ui-test-automation-model-51c0effb1e67',
       },
     ],
     url: 'https://www.salesforce.com/tdx/',
@@ -144,6 +152,8 @@ export const talks: Talk[] = [
       {
         title: '5 Things Salesforce Developers Should Know About Lightning Web Components',
         repo: 'https://github.com/svierk/awesome-lwc-collection',
+        article:
+          'https://levelup.gitconnected.com/5-things-salesforce-developers-should-know-about-lightning-web-components-098f3619851a',
       },
     ],
     url: 'https://wirsindohana.de/',

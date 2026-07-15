@@ -43,7 +43,7 @@ const dateLabel = end
         {talk.sessions.map((session) => (
           <li>
             <span class="session-title">“{session.title}”</span>
-            {(session.repo || session.slides) && (
+            {(session.repo || session.slides || session.article) && (
               <span class="links">
                 {session.repo && (
                   <a class="link-chip" href={session.repo} target="_blank" rel="noopener noreferrer">
@@ -60,6 +60,14 @@ const dateLabel = end
                       <path d="M14 2v6h6M16 13H8M16 17H8M10 9H8" />
                     </svg>
                     {t('speaking.slides')}
+                  </a>
+                )}
+                {session.article && (
+                  <a class="link-chip" href={session.article} target="_blank" rel="noopener noreferrer">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                      <path d="M13.54 12a6.8 6.8 0 0 1-6.77 6.82A6.8 6.8 0 0 1 0 12a6.8 6.8 0 0 1 6.77-6.82A6.8 6.8 0 0 1 13.54 12Zm7.42 0c0 3.54-1.51 6.42-3.38 6.42-1.87 0-3.39-2.88-3.39-6.42s1.52-6.42 3.39-6.42 3.38 2.88 3.38 6.42ZM24 12c0 3.17-.53 5.75-1.19 5.75-.66 0-1.19-2.58-1.19-5.75s.53-5.75 1.19-5.75C23.47 6.25 24 8.83 24 12Z" />
+                    </svg>
+                    {t('speaking.article')}
                   </a>
                 )}
               </span>

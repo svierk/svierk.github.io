@@ -9,6 +9,8 @@ export interface LiveSession {
   description: Record<Lang, string>;
   /** GitHub repo with demo code and assets for this session. */
   repo?: string;
+  /** Related blog article. */
+  article?: string;
 }
 
 export const liveSessions: LiveSession[] = [
@@ -33,6 +35,8 @@ export const liveSessions: LiveSession[] = [
       de: 'End-to-End-UI-Testautomatisierung für Salesforce mit dem UI Test Automation Model (UTAM) und CI/CD-Integration.',
     },
     repo: 'https://github.com/svierk/salesforce-utam-e2e-testing',
+    article:
+      'https://medium.com/capgemini-salesforce-architects/streamline-e2e-testing-with-utam-salesforces-ui-test-automation-model-51c0effb1e67',
   },
   {
     videoId: '-AMatcH64Cc',
@@ -43,6 +47,8 @@ export const liveSessions: LiveSession[] = [
       en: 'Using the GraphQL wire adapter to simplify the data layer of Lightning Web Components - often without any Apex.',
       de: 'Mit dem GraphQL Wire Adapter die Datenschicht von Lightning Web Components vereinfachen - oft ganz ohne Apex.',
     },
+    article:
+      'https://medium.com/capgemini-salesforce-architects/replace-apex-with-graphql-in-your-salesforce-ui-architecture-62693ff40f5b',
   },
   {
     videoId: 'WukMwcLk9_U',
@@ -54,5 +60,7 @@ export const liveSessions: LiveSession[] = [
       de: 'Praktische LWC-Lektionen - von Komponentendesign bis Testing - die die tägliche Entwicklung leichter machen.',
     },
     repo: 'https://github.com/svierk/awesome-lwc-collection',
+    article:
+      'https://levelup.gitconnected.com/5-things-salesforce-developers-should-know-about-lightning-web-components-098f3619851a',
   },
 ];
