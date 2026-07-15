@@ -61,6 +61,7 @@ export const talks: Talk[] = [
       {
         title: 'Anti-Patterns in Agentforce - 5 Mistakes That Look Like Best Practices',
         repo: 'https://github.com/rammc/agentforce-grounding-demo',
+        slides: '/slides/wirsindohana-26-agentforce-anti-patterns.pdf',
         article:
           'https://medium.com/capgemini-salesforce-architects/i-built-a-custom-vector-search-to-beat-salesforce-data-library-dc0dbd335576',
       },
@@ -77,6 +78,7 @@ export const talks: Talk[] = [
       {
         title: 'Diagnose a Monolithic Salesforce Org with Scale Center',
         repo: 'https://github.com/rammc/orgpulse',
+        slides: '/slides/albania-dreamin-26-scale-center.pdf',
         article:
           'https://medium.com/capgemini-salesforce-architects/when-scale-center-tells-you-whats-wrong-but-not-what-to-do-9cd3417637fb',
       },
@@ -94,10 +96,12 @@ export const talks: Talk[] = [
       {
         title: 'Automate UI Testing with AI and UTAM',
         repo: 'https://github.com/svierk/salesforce-utam-e2e-testing',
+        slides: '/slides/tdx-26-utam-ai.pdf',
       },
       {
         title: 'Design a DevOps Strategy for Multi-Org Implementations',
         repo: 'https://github.com/rammc/TDX-2026-Salesforce-DevOps-Multi-Org',
+        slides: '/slides/tdx-26-devops-multi-org.pdf',
       },
     ],
     url: 'https://www.salesforce.com/tdx/',
@@ -108,7 +112,12 @@ export const talks: Talk[] = [
     date: '2026-03-20',
     location: 'Wrocław, Poland',
     flag: '🇵🇱',
-    sessions: [{ title: 'From Scattered to Complete: Architecting a Real-World Customer 360 Use Case' }],
+    sessions: [
+      {
+        title: 'From Scattered to Complete: Architecting a Real-World Customer 360 Use Case',
+        slides: '/slides/polish-dreamin-26-customer-360.pdf',
+      },
+    ],
     url: 'https://dreamin.coffeeforce.pl/',
   },
   {
@@ -121,6 +130,7 @@ export const talks: Talk[] = [
       {
         title: 'Empowering Cross-Functional Teams with Scratch Orgs',
         repo: 'https://github.com/svierk/devops-dreamin-london-2025',
+        slides: '/slides/devops-dreamin-london-25-scratch-orgs.pdf',
       },
     ],
     url: 'https://devopsdreamin.com/',
@@ -136,6 +146,7 @@ export const talks: Talk[] = [
       {
         title: 'Streamline Salesforce E2E UI Testing with UTAM',
         repo: 'https://github.com/svierk/salesforce-utam-e2e-testing',
+        slides: '/slides/tdx-25-utam.pdf',
         article:
           'https://medium.com/capgemini-salesforce-architects/streamline-e2e-testing-with-utam-salesforces-ui-test-automation-model-51c0effb1e67',
       },
@@ -152,6 +163,7 @@ export const talks: Talk[] = [
       {
         title: '5 Things Salesforce Developers Should Know About Lightning Web Components',
         repo: 'https://github.com/svierk/awesome-lwc-collection',
+        slides: '/slides/wirsindohana-24-lwc.pdf',
         article:
           'https://levelup.gitconnected.com/5-things-salesforce-developers-should-know-about-lightning-web-components-098f3619851a',
       },
