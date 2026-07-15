@@ -1,0 +1,23 @@
+# Dependabot configuration for automated dependency updates.
+# Documentation:
+# https://docs.github.com/github/administering-a-repository/configuration-options-for-dependency-updates
+
+version: 2
+updates:
+  - package-ecosystem: 'npm'
+    directory: '/'
+    schedule:
+      interval: 'monthly'
+    groups:
+      dependencies:
+        patterns:
+          - '*'
+
+  - package-ecosystem: 'github-actions'
+    directory: '/'
+    schedule:
+      interval: 'monthly'
+    groups:
+      actions:
+        patterns:
+          - '*'
