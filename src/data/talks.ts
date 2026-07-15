@@ -1,3 +1,12 @@
+export interface TalkSession {
+  /** Session titles are proper names and stay in English in both languages. */
+  title: string;
+  /** GitHub repo with demo code and assets for this session. */
+  repo?: string;
+  /** PDF slide deck, served from /public (e.g. '/slides/tdx-25-utam.pdf'). */
+  slides?: string;
+}
+
 export interface Talk {
   id: string;
   event: string;
@@ -8,14 +17,11 @@ export interface Talk {
   location: string;
   /** Country flag emoji shown next to the location. */
   flag: string;
-  /** Session titles are proper names and stay in English in both languages. */
-  sessions: string[];
+  sessions: TalkSession[];
   /** True while the session details are not announced yet. */
   comingSoon?: boolean;
   /** Event website. */
   url?: string;
-  /** PDF slide decks per session, relative to /public (added later). */
-  slides?: { session: string; href: string }[];
 }
 
 export const talks: Talk[] = [
@@ -36,7 +42,7 @@ export const talks: Talk[] = [
     date: '2026-05-20',
     location: 'Messe Frankfurt, Germany',
     flag: '🇩🇪',
-    sessions: ["How to fail Industry Cloud fast. Let's not."],
+    sessions: [{ title: "How to fail Industry Cloud fast. Let's not." }],
   },
   {
     id: 'wirsindohana-26',
@@ -44,7 +50,7 @@ export const talks: Talk[] = [
     date: '2026-05-08',
     location: 'Kosmos, Berlin, Germany',
     flag: '🇩🇪',
-    sessions: ['Anti-Patterns in Agentforce - 5 Mistakes That Look Like Best Practices'],
+    sessions: [{ title: 'Anti-Patterns in Agentforce - 5 Mistakes That Look Like Best Practices' }],
     url: 'https://wirsindohana.de/',
   },
   {
@@ -53,7 +59,7 @@ export const talks: Talk[] = [
     date: '2026-04-25',
     location: 'Pyramid of Tirana, Albania',
     flag: '🇦🇱',
-    sessions: ['Diagnose a Monolithic Salesforce Org with Scale Center'],
+    sessions: [{ title: 'Diagnose a Monolithic Salesforce Org with Scale Center' }],
     url: 'https://dreamin.al/',
   },
   {
@@ -64,8 +70,11 @@ export const talks: Talk[] = [
     location: 'San Francisco, USA',
     flag: '🇺🇸',
     sessions: [
-      'Automate UI Testing with AI and UTAM',
-      'Design a DevOps Strategy for Multi-Org Implementations',
+      {
+        title: 'Automate UI Testing with AI and UTAM',
+        repo: 'https://github.com/svierk/salesforce-utam-e2e-testing',
+      },
+      { title: 'Design a DevOps Strategy for Multi-Org Implementations' },
     ],
     url: 'https://www.salesforce.com/tdx/',
   },
@@ -75,7 +84,7 @@ export const talks: Talk[] = [
     date: '2026-03-20',
     location: 'Wrocław, Poland',
     flag: '🇵🇱',
-    sessions: ['From Scattered to Complete: Architecting a Real-World Customer 360 Use Case'],
+    sessions: [{ title: 'From Scattered to Complete: Architecting a Real-World Customer 360 Use Case' }],
     url: 'https://dreamin.coffeeforce.pl/',
   },
   {
@@ -84,7 +93,12 @@ export const talks: Talk[] = [
     date: '2025-11-20',
     location: 'London, UK',
     flag: '🇬🇧',
-    sessions: ['Empowering Cross-Functional Teams with Scratch Orgs'],
+    sessions: [
+      {
+        title: 'Empowering Cross-Functional Teams with Scratch Orgs',
+        repo: 'https://github.com/svierk/devops-dreamin-london-2025',
+      },
+    ],
     url: 'https://devopsdreamin.com/',
   },
   {
@@ -94,7 +108,12 @@ export const talks: Talk[] = [
     dateEnd: '2025-03-06',
     location: 'San Francisco, USA',
     flag: '🇺🇸',
-    sessions: ['Streamline Salesforce E2E UI Testing with UTAM'],
+    sessions: [
+      {
+        title: 'Streamline Salesforce E2E UI Testing with UTAM',
+        repo: 'https://github.com/svierk/salesforce-utam-e2e-testing',
+      },
+    ],
     url: 'https://www.salesforce.com/tdx/',
   },
   {
@@ -103,7 +122,12 @@ export const talks: Talk[] = [
     date: '2024-05-24',
     location: 'Kosmos, Berlin, Germany',
     flag: '🇩🇪',
-    sessions: ['5 Things Salesforce Developers Should Know About Lightning Web Components'],
+    sessions: [
+      {
+        title: '5 Things Salesforce Developers Should Know About Lightning Web Components',
+        repo: 'https://github.com/svierk/awesome-lwc-collection',
+      },
+    ],
     url: 'https://wirsindohana.de/',
   },
 ];

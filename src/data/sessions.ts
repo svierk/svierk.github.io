@@ -7,6 +7,8 @@ export interface LiveSession {
   /** ISO publish date of the recording on YouTube. */
   date: string;
   description: Record<Lang, string>;
+  /** GitHub repo with demo code and assets for this session. */
+  repo?: string;
 }
 
 export const liveSessions: LiveSession[] = [
@@ -19,6 +21,7 @@ export const liveSessions: LiveSession[] = [
       en: 'How Scratch Org self-service enables cross-functional teams to develop, test and validate independently.',
       de: 'Wie Scratch-Org-Self-Service cross-funktionale Teams befähigt, unabhängig zu entwickeln, zu testen und zu validieren.',
     },
+    repo: 'https://github.com/svierk/devops-dreamin-london-2025',
   },
   {
     videoId: 'xnoZ2Lc_WnQ',
@@ -29,6 +32,7 @@ export const liveSessions: LiveSession[] = [
       en: 'End-to-end UI test automation for Salesforce with the UI Test Automation Model (UTAM) and CI/CD integration.',
       de: 'End-to-End-UI-Testautomatisierung für Salesforce mit dem UI Test Automation Model (UTAM) und CI/CD-Integration.',
     },
+    repo: 'https://github.com/svierk/salesforce-utam-e2e-testing',
   },
   {
     videoId: '-AMatcH64Cc',
@@ -49,5 +53,6 @@ export const liveSessions: LiveSession[] = [
       en: 'Practical LWC lessons learned - from component design to testing - that make everyday development easier.',
       de: 'Praktische LWC-Lektionen - von Komponentendesign bis Testing - die die tägliche Entwicklung leichter machen.',
     },
+    repo: 'https://github.com/svierk/awesome-lwc-collection',
   },
 ];

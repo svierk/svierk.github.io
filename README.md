@@ -29,4 +29,6 @@ A weekly scheduled workflow run keeps the article list and the upcoming/past
 split of talks current.
 
 Slide decks can be added as PDFs under `public/slides/` and referenced via the
-`slides` field of a talk in `src/data/talks.ts`.
+`slides` field of a session in `src/data/talks.ts`, e.g.
+`slides: '/slides/tdx-25-utam.pdf'`. Demo repos are linked via the `repo`
+field of a session (talks and live sessions).
