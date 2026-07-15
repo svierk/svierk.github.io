@@ -42,7 +42,12 @@ export const talks: Talk[] = [
     date: '2026-05-20',
     location: 'Messe Frankfurt, Germany',
     flag: '🇩🇪',
-    sessions: [{ title: "How to fail Industry Cloud fast. Let's not." }],
+    sessions: [
+      {
+        title: "How to fail Industry Cloud fast. Let's not.",
+        repo: 'https://github.com/rammc/cap-de-mfg-awt-demo',
+      },
+    ],
   },
   {
     id: 'wirsindohana-26',
@@ -50,7 +55,12 @@ export const talks: Talk[] = [
     date: '2026-05-08',
     location: 'Kosmos, Berlin, Germany',
     flag: '🇩🇪',
-    sessions: [{ title: 'Anti-Patterns in Agentforce - 5 Mistakes That Look Like Best Practices' }],
+    sessions: [
+      {
+        title: 'Anti-Patterns in Agentforce - 5 Mistakes That Look Like Best Practices',
+        repo: 'https://github.com/rammc/agentforce-grounding-demo',
+      },
+    ],
     url: 'https://wirsindohana.de/',
   },
   {
@@ -59,7 +69,12 @@ export const talks: Talk[] = [
     date: '2026-04-25',
     location: 'Pyramid of Tirana, Albania',
     flag: '🇦🇱',
-    sessions: [{ title: 'Diagnose a Monolithic Salesforce Org with Scale Center' }],
+    sessions: [
+      {
+        title: 'Diagnose a Monolithic Salesforce Org with Scale Center',
+        repo: 'https://github.com/rammc/orgpulse',
+      },
+    ],
     url: 'https://dreamin.al/',
   },
   {
@@ -74,7 +89,10 @@ export const talks: Talk[] = [
         title: 'Automate UI Testing with AI and UTAM',
         repo: 'https://github.com/svierk/salesforce-utam-e2e-testing',
       },
-      { title: 'Design a DevOps Strategy for Multi-Org Implementations' },
+      {
+        title: 'Design a DevOps Strategy for Multi-Org Implementations',
+        repo: 'https://github.com/rammc/TDX-2026-Salesforce-DevOps-Multi-Org',
+      },
     ],
     url: 'https://www.salesforce.com/tdx/',
   },
