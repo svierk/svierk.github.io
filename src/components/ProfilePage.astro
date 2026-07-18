@@ -1,5 +1,6 @@
 ---
 import ArticleList from './ArticleList.astro';
+import FeaturedCard from './FeaturedCard.astro';
 import Footer from './Footer.astro';
 import Hero from './Hero.astro';
 import Nav from './Nav.astro';
@@ -9,6 +10,7 @@ import TalkCard from './TalkCard.astro';
 import VideoCard from './VideoCard.astro';
 import Base from '../layouts/Base.astro';
 import { profile } from '../data/profile';
+import { features } from '../data/featured';
 import { githubProfileUrl, projects } from '../data/projects';
 import { liveSessions } from '../data/sessions';
 import { talks } from '../data/talks';
@@ -59,6 +61,12 @@ const sortedTalks = [...talks].sort((a, b) => b.date.localeCompare(a.date));
     <Section id="sessions" title={t('sessions.title')} subtitle={t('sessions.subtitle')}>
       <div class="grid-2">
         {liveSessions.map((session) => <VideoCard {session} {lang} />)}
+      </div>
+    </Section>
+
+    <Section id="featured" title={t('featured.title')} subtitle={t('featured.subtitle')}>
+      <div class="grid-2">
+        {features.map((feature) => <FeaturedCard {feature} {lang} />)}
       </div>
     </Section>
 
