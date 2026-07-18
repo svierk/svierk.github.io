@@ -9,6 +9,8 @@ export interface LiveSession {
   description: Record<Lang, string>;
   /** GitHub repo with demo code and assets for this session. */
   repo?: string;
+  /** PDF slide deck, served from /public (e.g. '/slides/tdx-25-utam.pdf'). */
+  slides?: string;
   /** Related blog article. */
   article?: string;
 }
@@ -24,6 +26,7 @@ export const liveSessions: LiveSession[] = [
       de: 'Wie Scratch-Org-Self-Service cross-funktionale Teams befähigt, unabhängig zu entwickeln, zu testen und zu validieren.',
     },
     repo: 'https://github.com/svierk/devops-dreamin-london-2025',
+    slides: '/slides/apex-hours-25-scratch-orgs.pdf',
   },
   {
     videoId: 'xnoZ2Lc_WnQ',
@@ -35,6 +38,7 @@ export const liveSessions: LiveSession[] = [
       de: 'End-to-End-UI-Testautomatisierung für Salesforce mit dem UI Test Automation Model (UTAM) und CI/CD-Integration.',
     },
     repo: 'https://github.com/svierk/salesforce-utam-e2e-testing',
+    slides: '/slides/apex-hours-25-utam.pdf',
     article:
       'https://medium.com/capgemini-salesforce-architects/streamline-e2e-testing-with-utam-salesforces-ui-test-automation-model-51c0effb1e67',
   },
@@ -47,6 +51,7 @@ export const liveSessions: LiveSession[] = [
       en: 'Using the GraphQL wire adapter to simplify the data layer of Lightning Web Components - often without any Apex.',
       de: 'Mit dem GraphQL Wire Adapter die Datenschicht von Lightning Web Components vereinfachen - oft ganz ohne Apex.',
     },
+    slides: '/slides/apex-hours-24-graphql.pdf',
     article:
       'https://medium.com/capgemini-salesforce-architects/replace-apex-with-graphql-in-your-salesforce-ui-architecture-62693ff40f5b',
   },
@@ -60,6 +65,7 @@ export const liveSessions: LiveSession[] = [
       de: 'Praktische LWC-Lektionen - von Komponentendesign bis Testing - die die tägliche Entwicklung leichter machen.',
     },
     repo: 'https://github.com/svierk/awesome-lwc-collection',
+    slides: '/slides/apex-hours-24-lwc.pdf',
     article:
       'https://levelup.gitconnected.com/5-things-salesforce-developers-should-know-about-lightning-web-components-098f3619851a',
   },
