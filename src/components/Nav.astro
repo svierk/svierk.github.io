@@ -47,9 +47,37 @@ const links = [
           <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
         </svg>
       </button>
+      <button
+        id="nav-toggle"
+        class="nav-toggle"
+        type="button"
+        aria-label={t('nav.openMenu')}
+        aria-expanded="false"
+        aria-controls="mobile-nav"
+        data-label-open={t('nav.openMenu')}
+        data-label-close={t('nav.closeMenu')}
+      >
+        <svg class="icon-menu" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+          <path d="M3 6h18M3 12h18M3 18h18"></path>
+        </svg>
+        <svg class="icon-close" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+          <path d="M6 6l12 12M18 6 6 18"></path>
+        </svg>
+      </button>
     </div>
   </nav>
 </header>
+<div class="mobile-nav" id="mobile-nav">
+  <ul>
+    {
+      links.map((link) => (
+        <li>
+          <a href={link.href}>{link.label}</a>
+        </li>
+      ))
+    }
+  </ul>
+</div>
 
 <script>
   const toggle = document.getElementById('theme-toggle');
@@ -57,6 +85,33 @@ const links = [
     const next = document.documentElement.dataset.theme === 'light' ? 'dark' : 'light';
     document.documentElement.dataset.theme = next;
     localStorage.setItem('theme', next);
+  });
+
+  const navToggle = document.getElementById('nav-toggle');
+  const mobileNav = document.getElementById('mobile-nav');
+
+  const closeMobileNav = () => {
+    navToggle?.setAttribute('aria-expanded', 'false');
+    navToggle?.setAttribute('aria-label', navToggle.dataset.labelOpen ?? '');
+    mobileNav?.classList.remove('open');
+    document.body.classList.remove('nav-locked');
+  };
+
+  navToggle?.addEventListener('click', () => {
+    const isOpen = navToggle.getAttribute('aria-expanded') === 'true';
+    const willOpen = !isOpen;
+    navToggle.setAttribute('aria-expanded', String(willOpen));
+    navToggle.setAttribute('aria-label', (willOpen ? navToggle.dataset.labelClose : navToggle.dataset.labelOpen) ?? '');
+    mobileNav?.classList.toggle('open', willOpen);
+    document.body.classList.toggle('nav-locked', willOpen);
+  });
+
+  mobileNav?.querySelectorAll('a').forEach((link) => {
+    link.addEventListener('click', closeMobileNav);
+  });
+
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') closeMobileNav();
   });
 </script>
 
@@ -100,6 +155,7 @@ const links = [
     color: var(--text-muted);
     font-size: 0.95rem;
     font-weight: 500;
+    white-space: nowrap;
   }
 
   .links a:hover {
@@ -164,7 +220,41 @@ const links = [
     display: none;
   }
 
-  @media (max-width: 720px) {
+  .nav-toggle {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    width: 2.15rem;
+    height: 2.15rem;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: transparent;
+    color: var(--text-muted);
+    cursor: pointer;
+  }
+
+  .nav-toggle:hover {
+    color: var(--accent);
+    border-color: var(--accent);
+  }
+
+  .icon-close {
+    display: none;
+  }
+
+  .nav-toggle[aria-expanded='true'] .icon-menu {
+    display: none;
+  }
+
+  .nav-toggle[aria-expanded='true'] .icon-close {
+    display: block;
+  }
+
+  .mobile-nav {
+    display: none;
+  }
+
+  @media (max-width: 900px) {
     .links {
       display: none;
     }
@@ -172,5 +262,60 @@ const links = [
     .actions {
       margin-left: auto;
     }
+
+    .nav-toggle {
+      display: inline-flex;
+    }
+
+    .mobile-nav {
+      display: block;
+      position: fixed;
+      top: 4rem;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 20;
+      background: var(--bg);
+      overflow-y: auto;
+      transform: translateY(-8px);
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s;
+    }
+
+    .mobile-nav.open {
+      transform: translateY(0);
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto;
+    }
+
+    .mobile-nav ul {
+      list-style: none;
+      margin: 0;
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+
+    .mobile-nav a {
+      display: block;
+      padding: 0.85rem 0.25rem;
+      font-size: 1.05rem;
+      font-weight: 500;
+      color: var(--text);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .mobile-nav a:hover {
+      color: var(--accent);
+      text-decoration: none;
+    }
+  }
+
+  :global(body.nav-locked) {
+    overflow: hidden;
   }
 </style>

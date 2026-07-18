@@ -17,6 +17,8 @@ export const ui = {
     'nav.featured': 'Featured',
     'nav.blog': 'Blog',
     'nav.opensource': 'Open Source',
+    'nav.openMenu': 'Open menu',
+    'nav.closeMenu': 'Close menu',
     'hero.greeting': "Hi, I'm",
     'hero.role': 'Salesforce CTO Germany @ Capgemini · Technical Architect',
     'hero.tagline':
@@ -64,6 +66,8 @@ export const ui = {
     'nav.featured': 'Featured',
     'nav.blog': 'Blog',
     'nav.opensource': 'Open Source',
+    'nav.openMenu': 'Menü öffnen',
+    'nav.closeMenu': 'Menü schließen',
     'hero.greeting': 'Hi, ich bin',
     'hero.role': 'Salesforce CTO Germany @ Capgemini · Technical Architect',
     'hero.tagline':
