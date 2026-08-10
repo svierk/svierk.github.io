@@ -17,6 +17,18 @@ export interface LiveSession {
 
 export const liveSessions: LiveSession[] = [
   {
+    videoId: '-PaSb-zWjbQ',
+    title: 'Automate UI Testing with AI and UTAM',
+    host: 'Apex Hours',
+    date: '2026-08-01',
+    description: {
+      en: 'How AI speeds up building and maintaining UTAM-based E2E UI tests for Salesforce - from page object generation to test authoring.',
+      de: 'Wie KI das Erstellen und Pflegen UTAM-basierter E2E-UI-Tests für Salesforce beschleunigt - von der Page-Object-Generierung bis zum Testaufbau.',
+    },
+    repo: 'https://github.com/svierk/salesforce-utam-e2e-testing',
+    slides: '/slides/apex-hours-26-utam-ai.pdf',
+  },
+  {
     videoId: 'WK82iigFKDA',
     title: 'Empowering Cross-Functional Teams with Scratch Orgs',
     host: 'Apex Hours',
