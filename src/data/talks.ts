@@ -34,8 +34,14 @@ export const talks: Talk[] = [
     dateEnd: '2026-09-17',
     location: 'San Francisco, USA',
     flag: '🇺🇸',
-    sessions: [],
-    comingSoon: true,
+    sessions: [
+      {
+        title: "An Architect's Guide to Prompt Engineering",
+      },
+      {
+        title: 'Design a DevOps Strategy for Multi-Org Implementations',
+      },
+    ],
     url: 'https://www.salesforce.com/dreamforce/',
   },
   {
