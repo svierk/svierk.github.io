@@ -1,5 +1,8 @@
 # svierk.github.io
 
+[![Validation](https://github.com/svierk/svierk.github.io/actions/workflows/ci.yml/badge.svg?branch=main&event=push)](https://github.com/svierk/svierk.github.io/actions/workflows/ci.yml)
+[![Deploy to GitHub Pages](https://github.com/svierk/svierk.github.io/actions/workflows/deploy.yml/badge.svg?branch=main&event=push)](https://github.com/svierk/svierk.github.io/actions/workflows/deploy.yml)
+
 Personal profile & track record of Sebastiano Schwarz - live at [svierk.github.io](https://svierk.github.io/).
 
 Built with [Astro](https://astro.build/), deployed to GitHub Pages via GitHub Actions.
