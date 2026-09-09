@@ -29,11 +29,12 @@ export const features: Feature[] = [
     publisher: 'Salesforce',
     series: 'Partner Mic',
     host: 'Katharina Gude',
+    date: '2026-09-09',
     description: {
-      en: 'A Partner Mic conversation on DevOps strategy for complex Salesforce landscapes: the biggest misconception teams start with, the challenge of running multiple orgs, where to begin, and how Agentforce and Data Cloud reshape the architecture decisions companies make today.',
-      de: 'Ein Partner-Mic-Gespräch über DevOps-Strategien für komplexe Salesforce-Landschaften: das größte Missverständnis beim Einstieg, die Herausforderung mehrerer Orgs, wo man beginnen sollte und wie Agentforce und Data Cloud Architekturentscheidungen verändern.',
+      en: 'A Partner Mic conversation on DevOps strategy for complex Salesforce landscapes: the biggest misconception teams start with, the challenge of running multiple orgs, where to begin, and how Agentforce and Data 360 reshape the architecture decisions companies make today.',
+      de: 'Ein Partner-Mic-Gespräch über DevOps-Strategien für komplexe Salesforce-Landschaften: das größte Missverständnis beim Einstieg, die Herausforderung mehrerer Orgs, wo man beginnen sollte und wie Agentforce und Data 360 Architekturentscheidungen verändern.',
     },
-    comingSoon: true,
+    url: 'https://www.linkedin.com/posts/katharina-gude-066021135_tiny-mic-series-ft-capgemini-activity-7503449795961790464-IbtO/',
   },
   {
     id: 'agentforce-success-factor',
