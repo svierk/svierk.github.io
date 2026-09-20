@@ -36,6 +36,7 @@ export const ui = {
       'Plus multiple local Trailblazer Community Group meet-ups.',
     'speaking.slides': 'Slides',
     'speaking.code': 'Code',
+    'speaking.demo': 'Demo',
     'speaking.article': 'Article',
     'sessions.title': 'Live Sessions',
     'sessions.subtitle': 'Recorded live sessions - grab a coffee and watch.',
@@ -85,6 +86,7 @@ export const ui = {
       'Dazu zahlreiche lokale Trailblazer-Community-Group-Meet-ups.',
     'speaking.slides': 'Slides',
     'speaking.code': 'Code',
+    'speaking.demo': 'Demo',
     'speaking.article': 'Artikel',
     'sessions.title': 'Live Sessions',
     'sessions.subtitle':

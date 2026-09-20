@@ -3,6 +3,8 @@ export interface TalkSession {
   title: string;
   /** GitHub repo with demo code and assets for this session. */
   repo?: string;
+  /** Hosted demo or interactive asset for this session. */
+  demo?: string;
   /** PDF slide deck, served from /public (e.g. '/slides/tdx-25-utam.pdf'). */
   slides?: string;
   /** Related blog article. */
@@ -37,9 +39,14 @@ export const talks: Talk[] = [
     sessions: [
       {
         title: "An Architect's Guide to Prompt Engineering",
+        repo: 'https://github.com/svierk/df26-architects-guide-to-prompt-engineering',
+        demo: 'https://svierk.github.io/df26-architects-guide-to-prompt-engineering/',
+        slides: '/slides/dreamforce-26-prompt-engineering.pdf',
       },
       {
         title: 'Design a DevOps Strategy for Multi-Org Implementations',
+        repo: 'https://github.com/rammc/Dreamforce-2026-Salesforce-DevOps-Multi-Org',
+        slides: '/slides/dreamforce-26-devops-multi-org.pdf',
       },
     ],
     url: 'https://www.salesforce.com/dreamforce/',
