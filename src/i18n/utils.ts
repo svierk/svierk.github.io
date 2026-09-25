@@ -24,3 +24,13 @@ export function formatDate(date: Date, lang: Lang, options?: Intl.DateTimeFormat
     ...options,
   });
 }
+
+/** "2 months ago" / "vor 2 Monaten", for the repository freshness label. */
+export function formatRelative(date: Date, lang: Lang): string {
+  const format = new Intl.RelativeTimeFormat(ui[lang]['date.locale'], { numeric: 'always' });
+  const days = Math.round((date.getTime() - Date.now()) / 86_400_000);
+
+  if (Math.abs(days) < 31) return format.format(days, 'day');
+  if (Math.abs(days) < 365) return format.format(Math.round(days / 30), 'month');
+  return format.format(Math.round(days / 365), 'year');
+}

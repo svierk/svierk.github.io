@@ -1,20 +1,29 @@
 const OWNER = 'svierk';
 
+export interface RepoMeta {
+  stars: number;
+  /** Primary language reported by GitHub, if the repo has one. */
+  language?: string;
+  forks: number;
+  /** ISO timestamp of the last push, used for the freshness label. */
+  pushedAt?: string;
+}
+
 /**
- * Fetches current star counts from the GitHub API at build time.
+ * Fetches repository metadata from the GitHub API at build time.
  * Uses GITHUB_TOKEN when available (provided automatically in Actions);
  * repos that cannot be fetched are simply missing from the result, so
  * callers fall back to the static snapshot in projects.ts.
  */
-let cached: Promise<Record<string, number>> | undefined;
+let cached: Promise<Record<string, RepoMeta>> | undefined;
 
-export function fetchStarCounts(repos: string[]): Promise<Record<string, number>> {
+export function fetchRepoMeta(repos: string[]): Promise<Record<string, RepoMeta>> {
   // Both language pages request the same repos; fetch only once per build.
-  cached ??= doFetchStarCounts(repos);
+  cached ??= doFetchRepoMeta(repos);
   return cached;
 }
 
-async function doFetchStarCounts(repos: string[]): Promise<Record<string, number>> {
+async function doFetchRepoMeta(repos: string[]): Promise<Record<string, RepoMeta>> {
   const headers: Record<string, string> = {
     Accept: 'application/vnd.github+json',
     'User-Agent': `${OWNER}.github.io-build`,
@@ -22,7 +31,7 @@ async function doFetchStarCounts(repos: string[]): Promise<Record<string, number
   const token = process.env.GITHUB_TOKEN;
   if (token) headers.Authorization = `Bearer ${token}`;
 
-  const counts: Record<string, number> = {};
+  const meta: Record<string, RepoMeta> = {};
   await Promise.all(
     repos.map(async (repo) => {
       try {
@@ -32,13 +41,17 @@ async function doFetchStarCounts(repos: string[]): Promise<Record<string, number
         });
         if (!response.ok) throw new Error(`API responded with ${response.status}`);
         const data = await response.json();
-        if (typeof data.stargazers_count === 'number') {
-          counts[repo] = data.stargazers_count;
-        }
+        if (typeof data.stargazers_count !== 'number') return;
+        meta[repo] = {
+          stars: data.stargazers_count,
+          language: typeof data.language === 'string' ? data.language : undefined,
+          forks: typeof data.forks_count === 'number' ? data.forks_count : 0,
+          pushedAt: typeof data.pushed_at === 'string' ? data.pushed_at : undefined,
+        };
       } catch (error) {
-        console.warn(`[github] Could not fetch stars for ${repo}, using static fallback: ${error}`);
+        console.warn(`[github] Could not fetch ${repo}, using static fallback: ${error}`);
       }
     }),
   );
-  return counts;
+  return meta;
 }

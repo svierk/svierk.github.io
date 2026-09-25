@@ -162,6 +162,38 @@ img {
   color: var(--text-muted);
 }
 
+/* Shared by the Speaking timeline and the Live Sessions grid. */
+.pager-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  width: 100%;
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  background: transparent;
+  border: 1px dashed var(--border);
+  border-radius: 12px;
+  padding: 0.65rem 1rem;
+  cursor: pointer;
+  transition:
+    color 0.2s ease,
+    border-color 0.2s ease,
+    background 0.2s ease;
+}
+
+.pager-button:hover {
+  color: var(--accent);
+  border-color: color-mix(in srgb, var(--accent) 50%, var(--border));
+  background: var(--accent-soft);
+}
+
+.pager-button[hidden] {
+  display: none;
+}
+
 .grid-2 {
   display: grid;
   grid-template-columns: repeat(2, 1fr);

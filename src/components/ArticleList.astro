@@ -23,9 +23,11 @@ const t = useTranslations(lang);
               {article.image && <img class="thumb" src={article.image} alt="" loading="lazy" width="84" height="84" />}
               <span class="text">
                 <span class="title">{article.title}</span>
-                <time class="muted" datetime={article.date.toISOString()}>
-                  {formatDate(article.date, lang)}
-                </time>
+                <span class="muted meta">
+                  <time datetime={article.date.toISOString()}>{formatDate(article.date, lang)}</time>
+                  <span class="dot" aria-hidden="true">·</span>
+                  {article.minutes} {t('blog.minRead')}
+                </span>
               </span>
             </a>
           </li>
@@ -97,8 +99,15 @@ const t = useTranslations(lang);
     font-weight: 600;
   }
 
-  time {
-    font-size: 0.88rem;
+  .meta {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.85rem;
+  }
+
+  .meta .dot {
+    opacity: 0.6;
   }
 
   .view-all {

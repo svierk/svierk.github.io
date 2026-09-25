@@ -1,0 +1,93 @@
+---
+interface Props {
+  /** How many items are visible before the button is pressed. */
+  pageSize: number;
+  /** Total number of items in the slotted container. */
+  total: number;
+  label: string;
+  /**
+   * The `display` the items use. Only needed for the no-JS fallback: reverting
+   * a `hidden` element lands back on the user-agent rule, which is
+   * `display: none`, so the value has to be restated explicitly.
+   */
+  itemDisplay?: string;
+}
+
+const { pageSize, total, label, itemDisplay = 'block' } = Astro.props;
+const hiddenCount = Math.max(total - pageSize, 0);
+---
+
+<paged-list data-page-size={pageSize}>
+  <slot />
+  <div class="pager">
+    <button type="button" class="pager-button" data-label={label} hidden={hiddenCount === 0}>
+      <span class="pager-label">{`${label} (${hiddenCount})`}</span>
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="m6 9 6 6 6-6"></path>
+      </svg>
+    </button>
+  </div>
+</paged-list>
+
+<noscript>
+  <style is:inline set:html={`
+    /* Without JS the button does nothing, so every item is shown. */
+    paged-list [data-paged-items] > [hidden] {
+      display: ${itemDisplay} !important;
+    }
+
+    paged-list .pager {
+      display: none !important;
+    }
+  `} />
+</noscript>
+
+<script>
+  /**
+   * Reveals a slotted list in pages. The markup ships with the overflow already
+   * hidden, so there is no flash of the full list before this runs.
+   */
+  class PagedList extends HTMLElement {
+    connectedCallback() {
+      const container = this.querySelector<HTMLElement>('[data-paged-items]');
+      const button = this.querySelector<HTMLButtonElement>('.pager-button');
+      const label = button?.querySelector<HTMLElement>('.pager-label');
+      if (!container || !button || !label) return;
+
+      const items = [...container.children] as HTMLElement[];
+      const step = Number(this.dataset.pageSize) || 4;
+      let visible = step;
+
+      const render = () => {
+        items.forEach((item, index) => {
+          item.hidden = index >= visible;
+        });
+        const remaining = items.length - Math.min(visible, items.length);
+        button.hidden = remaining === 0;
+        label.textContent = `${button.dataset.label} (${remaining})`;
+      };
+
+      button.addEventListener('click', () => {
+        const firstNew = items[visible];
+        visible += step;
+        render();
+        // Keep the keyboard focus somewhere sensible once the button disappears.
+        if (button.hidden) firstNew?.querySelector('a')?.focus();
+      });
+
+      render();
+    }
+  }
+
+  customElements.define('paged-list', PagedList);
+</script>
+
+<style>
+  paged-list {
+    display: block;
+  }
+
+  .pager {
+    margin-top: 1.25rem;
+  }
+</style>

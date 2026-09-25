@@ -6,15 +6,17 @@ import { formatDate, useTranslations } from '../i18n/utils';
 interface Props {
   session: LiveSession;
   lang: Lang;
+  /** Set for cards beyond the first page; PagedList takes over from there. */
+  hidden?: boolean;
 }
 
-const { session, lang } = Astro.props;
+const { session, lang, hidden } = Astro.props;
 const t = useTranslations(lang);
 const videoUrl = `https://www.youtube.com/watch?v=${session.videoId}`;
 const thumbnail = `https://img.youtube.com/vi/${session.videoId}/hqdefault.jpg`;
 ---
 
-<article class="card video">
+<article class="card video" {hidden}>
   <a class="thumb" href={videoUrl} target="_blank" rel="noopener noreferrer" aria-label={`${t('sessions.watch')}: ${session.title}`}>
     <img src={thumbnail} alt="" loading="lazy" width="480" height="360" />
     <span class="play" aria-hidden="true">
@@ -64,6 +66,11 @@ const thumbnail = `https://img.youtube.com/vi/${session.videoId}/hqdefault.jpg`;
 </article>
 
 <style>
+  /* `hidden` has to beat the display declaration below. */
+  .video[hidden] {
+    display: none;
+  }
+
   .video {
     padding: 0;
     overflow: hidden;

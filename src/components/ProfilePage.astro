@@ -4,6 +4,7 @@ import FeaturedCard from './FeaturedCard.astro';
 import Footer from './Footer.astro';
 import Hero from './Hero.astro';
 import Nav from './Nav.astro';
+import PagedList from './PagedList.astro';
 import ProjectCard from './ProjectCard.astro';
 import Section from './Section.astro';
 import Speaking from './Speaking.astro';
@@ -15,7 +16,7 @@ import { githubProfileUrl, projects } from '../data/projects';
 import { liveSessions } from '../data/sessions';
 import type { Lang } from '../i18n/ui';
 import { useTranslations } from '../i18n/utils';
-import { fetchStarCounts } from '../lib/github';
+import { fetchRepoMeta } from '../lib/github';
 import { fetchMediumArticles } from '../lib/medium';
 
 interface Props {
@@ -26,7 +27,10 @@ const { lang } = Astro.props;
 const t = useTranslations(lang);
 
 const articles = await fetchMediumArticles(profile.mediumFeed);
-const starCounts = await fetchStarCounts(projects.map((project) => project.repo));
+const repoMeta = await fetchRepoMeta(projects.map((project) => project.repo));
+
+/** How many live sessions are visible before "show more" is pressed. */
+const SESSION_PAGE_SIZE = 4;
 ---
 
 <Base {lang}>
@@ -34,18 +38,18 @@ const starCounts = await fetchStarCounts(projects.map((project) => project.repo)
   <main>
     <Hero {lang} />
 
-    <Section id="about" title={t('about.title')}>
-      <p class="about-body">{t('about.body')}</p>
-    </Section>
-
     <Section id="speaking" title={t('speaking.title')} subtitle={t('speaking.subtitle')}>
       <Speaking {lang} />
     </Section>
 
     <Section id="sessions" title={t('sessions.title')} subtitle={t('sessions.subtitle')}>
-      <div class="grid-2">
-        {liveSessions.map((session) => <VideoCard {session} {lang} />)}
-      </div>
+      <PagedList pageSize={SESSION_PAGE_SIZE} total={liveSessions.length} label={t('common.showMore')} itemDisplay="flex">
+        <div class="grid-2" data-paged-items>
+          {liveSessions.map((session, index) => (
+            <VideoCard {session} {lang} hidden={index >= SESSION_PAGE_SIZE} />
+          ))}
+        </div>
+      </PagedList>
     </Section>
 
     <Section id="featured" title={t('featured.title')} subtitle={t('featured.subtitle')}>
@@ -60,7 +64,7 @@ const starCounts = await fetchStarCounts(projects.map((project) => project.repo)
 
     <Section id="opensource" title={t('opensource.title')} subtitle={t('opensource.subtitle')}>
       <div class="grid-2">
-        {projects.map((project) => <ProjectCard {project} {lang} stars={starCounts[project.repo]} />)}
+        {projects.map((project) => <ProjectCard {project} {lang} meta={repoMeta[project.repo]} />)}
       </div>
       <p class="view-all">
         <a href={githubProfileUrl} target="_blank" rel="noopener noreferrer">{t('opensource.viewAll')} →</a>
@@ -71,11 +75,6 @@ const starCounts = await fetchStarCounts(projects.map((project) => project.repo)
 </Base>
 
 <style>
-  .about-body {
-    max-width: 46rem;
-    margin: 0;
-  }
-
   .view-all {
     margin-top: 1.25rem;
   }

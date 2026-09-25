@@ -88,8 +88,8 @@ const hiddenCount = Math.max(sortedTalks.length - PAGE_SIZE, 0);
     </ol>
 
     <div class="pager">
-      <button type="button" class="pager-button" data-label={t('speaking.showMore')} hidden={hiddenCount === 0}>
-        <span class="pager-label">{`${t('speaking.showMore')} (${hiddenCount})`}</span>
+      <button type="button" class="pager-button" data-label={t('common.showMore')} hidden={hiddenCount === 0}>
+        <span class="pager-label">{`${t('common.showMore')} (${hiddenCount})`}</span>
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
           <path d="m6 9 6 6 6-6"></path>
         </svg>
@@ -318,9 +318,8 @@ const hiddenCount = Math.max(sortedTalks.length - PAGE_SIZE, 0);
       background 0.2s ease;
   }
 
-  /* `hidden` has to beat the display declarations above. */
-  .filter-chip[hidden],
-  .pager-button[hidden] {
+  /* `hidden` has to beat the display declaration above. */
+  .filter-chip[hidden] {
     display: none;
   }
 
@@ -413,33 +412,6 @@ const hiddenCount = Math.max(sortedTalks.length - PAGE_SIZE, 0);
   .pager {
     margin-top: 1.1rem;
     padding-left: 1.5rem;
-  }
-
-  .pager-button {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.4rem;
-    width: 100%;
-    font: inherit;
-    font-size: 0.9rem;
-    font-weight: 600;
-    color: var(--text-muted);
-    background: transparent;
-    border: 1px dashed var(--border);
-    border-radius: 12px;
-    padding: 0.65rem 1rem;
-    cursor: pointer;
-    transition:
-      color 0.2s ease,
-      border-color 0.2s ease,
-      background 0.2s ease;
-  }
-
-  .pager-button:hover {
-    color: var(--accent);
-    border-color: color-mix(in srgb, var(--accent) 50%, var(--border));
-    background: var(--accent-soft);
   }
 
   .meetups {

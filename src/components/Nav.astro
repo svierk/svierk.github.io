@@ -13,7 +13,6 @@ const home = homePath(lang);
 const alt = altLangPath(lang);
 
 const links = [
-  { href: `${home}#about`, label: t('nav.about') },
   { href: `${home}#speaking`, label: t('nav.speaking') },
   { href: `${home}#sessions`, label: t('nav.sessions') },
   { href: `${home}#featured`, label: t('nav.featured') },
@@ -113,6 +112,73 @@ const links = [
   document.addEventListener('keydown', (event) => {
     if (event.key === 'Escape') closeMobileNav();
   });
+
+  // ── Scroll spy: mark the section the reader is currently in ──
+  const sections = [...document.querySelectorAll<HTMLElement>('main section[id]')];
+  const linksByHash = new Map<string, HTMLAnchorElement[]>();
+
+  for (const link of document.querySelectorAll<HTMLAnchorElement>('nav .links a, .mobile-nav a')) {
+    const hash = link.getAttribute('href')?.split('#')[1];
+    if (!hash) continue;
+    linksByHash.set(hash, [...(linksByHash.get(hash) ?? []), link]);
+  }
+
+  if (sections.length > 0 && linksByHash.size > 0) {
+    let current: string | null = null;
+
+    const setCurrent = (id: string | null) => {
+      if (id === current) return;
+      current = id;
+      for (const [hash, links] of linksByHash) {
+        for (const link of links) {
+          if (hash === id) link.setAttribute('aria-current', 'true');
+          else link.removeAttribute('aria-current');
+        }
+      }
+    };
+
+    // A thin band below the sticky header: whatever crosses it is "current".
+    const inBand = new Set<string>();
+    /**
+     * Once the page is scrolled all the way down there is no room left to push
+     * the last section up into the band, so on a tall viewport it could never
+     * become current. Reaching the footer stands in for "at the bottom".
+     */
+    let atBottom = false;
+
+    const pick = () =>
+      atBottom
+        ? sections[sections.length - 1].id
+        : (sections.find((section) => inBand.has(section.id))?.id ?? null);
+
+    const bandObserver = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) inBand.add(entry.target.id);
+          else inBand.delete(entry.target.id);
+        }
+        setCurrent(pick());
+      },
+      { rootMargin: '-20% 0px -70% 0px' },
+    );
+
+    for (const section of sections) bandObserver.observe(section);
+
+    const footer = document.querySelector('footer');
+    if (footer) {
+      new IntersectionObserver(
+        ([entry]) => {
+          atBottom = entry.isIntersecting;
+          setCurrent(pick());
+        },
+        // Nothing follows the footer, so it coming into range means the end of
+        // the page. The margin scales with the viewport because that is what
+        // the dead zone scales with, and a ratio threshold would be brittle -
+        // a fractional footer height never quite reaches 1.
+        { rootMargin: '0px 0px 25% 0px' },
+      ).observe(footer);
+    }
+  }
 </script>
 
 <style>
@@ -152,15 +218,37 @@ const links = [
   }
 
   .links a {
+    position: relative;
     color: var(--text-muted);
     font-size: 0.95rem;
     font-weight: 500;
     white-space: nowrap;
+    transition: color 0.2s ease;
   }
 
-  .links a:hover {
+  .links a::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -0.45rem;
+    height: 2px;
+    border-radius: 2px;
+    background: linear-gradient(90deg, var(--accent), var(--accent-2));
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.25s ease;
+  }
+
+  .links a:hover,
+  .links a[aria-current] {
     color: var(--text);
     text-decoration: none;
+  }
+
+  .links a:hover::after,
+  .links a[aria-current]::after {
+    transform: scaleX(1);
   }
 
   .actions {
@@ -309,7 +397,8 @@ const links = [
       border-bottom: 1px solid var(--border);
     }
 
-    .mobile-nav a:hover {
+    .mobile-nav a:hover,
+    .mobile-nav a[aria-current] {
       color: var(--accent);
       text-decoration: none;
     }

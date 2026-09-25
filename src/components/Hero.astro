@@ -4,6 +4,7 @@ import portrait from '../assets/portrait.jpg';
 import { profile } from '../data/profile';
 import type { Lang } from '../i18n/ui';
 import { useTranslations } from '../i18n/utils';
+import FocusAreas from './FocusAreas.astro';
 import SocialLinks from './SocialLinks.astro';
 
 interface Props {
@@ -15,34 +16,41 @@ const t = useTranslations(lang);
 ---
 
 <section class="hero container">
-  <div class="text">
-    <p class="greeting">{t('hero.greeting')}</p>
-    <h1>{profile.name}</h1>
-    <p class="role">{t('hero.role')}</p>
-    <p class="tagline">{t('hero.tagline')}</p>
-    <div class="meta">
-      <span class="location muted">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"></path>
-          <circle cx="12" cy="10" r="3"></circle>
-        </svg>
-        {t('hero.location')}
-      </span>
-      <SocialLinks />
+  <div class="intro">
+    <div class="text">
+      <p class="greeting">{t('hero.greeting')}</p>
+      <h1>{profile.name}</h1>
+      <p class="role">{t('hero.role')}</p>
+      <p class="tagline">{t('hero.tagline')}</p>
+      <div class="meta">
+        <span class="location muted">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"></path>
+            <circle cx="12" cy="10" r="3"></circle>
+          </svg>
+          {t('hero.location')}
+        </span>
+        <SocialLinks />
+      </div>
+    </div>
+    <div class="portrait-wrap">
+      <Image class="portrait" src={portrait} alt={profile.name} width={280} height={280} densities={[1, 2]} loading="eager" />
     </div>
   </div>
-  <div class="portrait-wrap">
-    <Image class="portrait" src={portrait} alt={profile.name} width={280} height={280} densities={[1, 2]} loading="eager" />
-  </div>
+
+  <FocusAreas {lang} />
 </section>
 
 <style>
   .hero {
+    padding-top: 6rem;
+    padding-bottom: 1.5rem;
+  }
+
+  .intro {
     display: flex;
     align-items: center;
     gap: 3rem;
-    padding-top: 6rem;
-    padding-bottom: 1.5rem;
   }
 
   .text {
@@ -58,10 +66,6 @@ const t = useTranslations(lang);
   h1 {
     font-size: clamp(2.4rem, 6vw, 3.6rem);
     margin-bottom: 0.35rem;
-    background: linear-gradient(105deg, var(--text) 45%, var(--accent) 85%, var(--accent-2) 110%);
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
   }
 
   .role {
@@ -96,15 +100,15 @@ const t = useTranslations(lang);
     flex-shrink: 0;
   }
 
-  /* Soft color glow behind the portrait. */
+  /* A hint of depth behind the portrait - wide and faint, not a halo. */
   .portrait-wrap::before {
     content: '';
     position: absolute;
-    inset: -14px;
+    inset: -8px;
     border-radius: 40px;
     background: linear-gradient(135deg, var(--accent), var(--accent-2));
-    filter: blur(34px);
-    opacity: 0.4;
+    filter: blur(44px);
+    opacity: 0.16;
   }
 
   .portrait {
@@ -118,10 +122,13 @@ const t = useTranslations(lang);
 
   @media (max-width: 720px) {
     .hero {
+      padding-top: 3.5rem;
+    }
+
+    .intro {
       flex-direction: column-reverse;
       align-items: flex-start;
       gap: 2rem;
-      padding-top: 3.5rem;
     }
 
     .portrait {
