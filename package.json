@@ -11,7 +11,7 @@
     "build": "astro build",
     "preview": "astro preview",
     "astro": "astro",
-    "generate:map": "node scripts/generate-world-map.mjs"
+    "generate:globe": "node scripts/generate-globe.mjs"
   },
   "dependencies": {
     "astro": "^7.2.8"

@@ -15,7 +15,7 @@ npm install
 npm run dev           # local dev server
 npm run build         # production build into dist/
 npm run preview       # preview the production build
-npm run generate:map  # re-render the world map data (rarely needed, see below)
+npm run generate:globe # re-render the globe's land mask (rarely needed, see below)
 ```
 
 ## Content
@@ -43,40 +43,49 @@ for a PDF deck and `article` for a related blog post. Slide decks live in
 `public/slides/` and are referenced by their public path, e.g.
 `slides: '/slides/tdx-25-utam.pdf'`.
 
-## World map
+## Globe
 
-The Speaking section opens with a dot-matrix world map, one marker per venue.
-Markers are positioned from the `coords` of the entry a talk's `place` points
-at in `src/data/talks.ts` - a new city needs a new entry in the `places`
-registry there, nothing else. Markers that would overlap (Berlin and Frankfurt
-are a few pixels apart at this scale) are pushed apart automatically and keep a
-thin leader line back to their real position.
+The Speaking section is built around a rotating dot globe, drawn on a canvas
+without any mapping library. It turns slowly on its own and stops whenever
+something is going on - a drag, the pointer resting on it, or a filter being
+applied - then picks the rotation back up once things have been quiet for a
+moment. It also parks itself while scrolled out of view or in a background tab,
+and holds still entirely under `prefers-reduced-motion`.
 
-The visible window is cropped to the region that actually has events plus
-padding, rather than being hard-coded, so a talk on a new continent widens the
-map by itself instead of falling off the edge. Land dots outside that window
-are dropped at build time. Tune the framing via `CROP_PADDING`, `CROP_RATIO`
-and `MIN_CROP_WIDTH` in `src/lib/speaking.ts`.
+City markers are real HTML buttons positioned over the canvas each frame rather
+than shapes painted into it, so they keep their focus ring, their tooltip and
+their place in the tab order. Markers that would overlap - Berlin, Frankfurt and
+Wroclaw sit a handful of pixels apart at this scale - are pushed apart in screen
+space every frame and keep a thin leader line back to the real city.
 
-The underlying map is pre-rendered into `src/data/worldMap.ts`, a single SVG
-path of ~6200 dots covering the whole world, so the page ships no mapping
-library and makes no requests at runtime. Only the cropped subset (~1800 dots)
-reaches the browser. Source data: Natural Earth 1:110m land polygons, public
-domain.
+Markers come from the `coords` of the entry a talk's `place` points at in
+`src/data/talks.ts`; a new city needs a new entry in the `places` registry
+there, nothing else.
 
-`src/data/worldMap.ts` is a generated but committed artifact - the build never
-regenerates it. Coastlines do not change, and keeping it in the repository
-keeps the build offline-safe and reproducible. Re-run `npm run generate:map`
-(needs network access) only after changing the projection, the grid spacing or
-the latitude range in `scripts/generate-world-map.mjs`, and commit the result
-together with the script.
+The land mask is generated into `src/data/globeLand.ts`: one row per latitude,
+with the number of longitude samples scaled by cos(lat) so the dots stay evenly
+spaced, packed into a base64 bit mask. That keeps ~4800 land points in under
+4 KB, which the browser expands into unit vectors at load.
 
-Below the map, the event list is filtered by the year and city chips and paged
-with a "show more" button. A year filter thins the map to the matching cities;
-a city filter leaves every marker in place so the next city stays one click
-away. Hovering or focusing an event card lights up its marker. Without
-JavaScript the filters and the button are hidden and every event is rendered,
-so nothing is lost for crawlers.
+`src/data/globeLand.ts` is a generated but committed artifact - the build never
+regenerates it. Coastlines do not change, and keeping it in the repository keeps
+the build offline-safe and reproducible. Re-run `npm run generate:globe` (needs
+network access) only after changing the sampling in
+`scripts/generate-globe.mjs`, and commit the result together with the script. Source data: Natural Earth 1:110m land polygons, public domain.
+
+On a wide screen the section is two columns: the counters, the globe and the
+filter chips on the left, the event list on the right. Below 900px they stack
+into counters, globe, filters, list. The left column is sticky, so the globe
+stays in view while the list is scrolled - which is also why the event cards are
+denser than the cards elsewhere on the page.
+
+The event list is filtered by the year and city chips and paged with a "show
+more" button. A year filter thins the globe down to the
+matching cities and turns it to frame them; a city filter leaves every marker in
+place so the next city stays one click away. Hovering or focusing an event card
+lights up its marker and spins the globe to it, and picking a marker filters the
+list. Without JavaScript the globe, the filters and the button are hidden and
+every event is rendered, so nothing is lost for crawlers.
 
 ## Pipelines
 

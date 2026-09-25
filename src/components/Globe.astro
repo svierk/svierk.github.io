@@ -1,0 +1,795 @@
+---
+import type { Lang } from '../i18n/ui';
+import { useTranslations } from '../i18n/utils';
+import type { GlobeCity } from '../lib/speaking';
+
+interface Props {
+  cities: GlobeCity[];
+  lang: Lang;
+}
+
+const { cities, lang } = Astro.props;
+const t = useTranslations(lang);
+---
+
+<speaking-globe>
+  <div class="stage">
+    <canvas role="img" aria-label={t('speaking.mapLabel')}></canvas>
+    {
+      cities.map((city) => (
+        <button
+          type="button"
+          class="marker"
+          data-place={city.id}
+          data-city={city.city}
+          data-flag={city.flag}
+          data-lat={city.lat}
+          data-lng={city.lng}
+          data-count={city.events.length}
+          data-years={city.years.join(' ')}
+          data-upcoming={String(city.upcoming)}
+          style={`--size:${10 + Math.min(city.events.length - 1, 4) * 2.5}px`}
+          aria-pressed="false"
+          hidden
+        >
+          <span class="pin" aria-hidden="true" />
+          <span class="tip">
+            <span class="tip-city">
+              <span class="tip-flag" aria-hidden="true">
+                {city.flag}
+              </span>
+              {city.city}
+            </span>
+            {city.events.map((event) => (
+              <span class="tip-event">
+                {event.event}
+                <span class="tip-year">{event.date.slice(0, 4)}</span>
+              </span>
+            ))}
+          </span>
+        </button>
+      ))
+    }
+  </div>
+  <p class="hint muted">{t('speaking.globeHint')}</p>
+</speaking-globe>
+
+<noscript>
+  <style is:inline>
+    /* The globe is a progressive enhancement - without JS it stays blank. */
+    speaking-globe {
+      display: none !important;
+    }
+  </style>
+</noscript>
+
+<script>
+  import { landRows, latStart, latStep } from '../data/globeLand';
+
+  const B64 = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
+
+  /** Unit vector on the sphere, z pointing north. */
+  function vec(lng: number, lat: number): [number, number, number] {
+    const l = (lng * Math.PI) / 180;
+    const p = (lat * Math.PI) / 180;
+    return [Math.cos(p) * Math.cos(l), Math.cos(p) * Math.sin(l), Math.sin(p)];
+  }
+
+  /** Expands the packed bit mask back into a flat [x, y, z, x, y, z, …] buffer. */
+  function decodeLand(): Float32Array {
+    const out: number[] = [];
+
+    landRows.split(',').forEach((row, index) => {
+      const [countText, bits] = row.split(':');
+      const count = Number(countText);
+      const lat = latStart + index * latStep;
+
+      for (let i = 0; i < count; i += 1) {
+        if ((B64.indexOf(bits[(i / 6) | 0]) >> (5 - (i % 6))) & 1) {
+          out.push(...vec(-180 + ((i + 0.5) * 360) / count, lat));
+        }
+      }
+    });
+
+    return new Float32Array(out);
+  }
+
+  let land: Float32Array | null = null;
+
+  interface City {
+    el: HTMLButtonElement;
+    id: string;
+    lat: number;
+    lng: number;
+    v: [number, number, number];
+    /** Marker radius in CSS pixels, used to keep neighbours from overlapping. */
+    r: number;
+    muted: boolean;
+    /** Scratch slots for the per-frame layout. */
+    shown: boolean;
+    depth: number;
+    sx: number;
+    sy: number;
+    tx: number;
+    ty: number;
+    x: number;
+    y: number;
+  }
+
+  /**
+   * A dot globe rendered on a canvas, with the city markers kept as real HTML
+   * buttons on top so they stay focusable and keep their tooltips.
+   *
+   * It spins on its own and stops while anything is going on - a drag, a
+   * pointer resting on it, or a filter being applied - then picks the rotation
+   * back up once things have been quiet for a moment.
+   */
+  class SpeakingGlobe extends HTMLElement {
+    private cities: City[] = [];
+    private stage!: HTMLDivElement;
+    private canvas!: HTMLCanvasElement;
+    private ctx!: CanvasRenderingContext2D;
+    private size = 0;
+    private dpr = 1;
+
+    /** Rotation: longitude brought to the centre, and the north/south tilt. */
+    private lambda = 14;
+    private phi = 22;
+    private anim: { t0: number; l0: number; l1: number; p0: number; p1: number } | null = null;
+    private drag: { x: number; y: number; l: number; p: number; moved: boolean } | null = null;
+
+    private hovering = false;
+    /** Auto-rotation resumes once the clock passes this. */
+    private idleAt = 0;
+    private raf = 0;
+    /** Timer that restarts the loop once the interaction pause has run out. */
+    private wake = 0;
+    private onScreen = true;
+    private last = 0;
+
+    private selected: string | null = null;
+    private highlighted: string | null = null;
+    private visible: Set<string> | null = null;
+
+    private reduced = matchMedia('(prefers-reduced-motion: reduce)');
+    private colors = { core: '#172234', shell: '#0b0e14', rim: '#333', dot: '#999', glow: '#0000', stick: '#4da3ff' };
+
+    connectedCallback() {
+      const stage = this.querySelector<HTMLDivElement>('.stage');
+      const canvas = stage?.querySelector('canvas');
+      const ctx = canvas?.getContext('2d');
+      if (!stage || !canvas || !ctx) return;
+
+      this.stage = stage;
+      this.canvas = canvas;
+      this.ctx = ctx;
+      land ??= decodeLand();
+
+      this.cities = [...this.querySelectorAll<HTMLButtonElement>('.marker')].map((el) => {
+        const lat = Number(el.dataset.lat);
+        const lng = Number(el.dataset.lng);
+        el.hidden = false;
+        return {
+          el,
+          id: el.dataset.place!,
+          lat,
+          lng,
+          v: vec(lng, lat),
+          r: el.getBoundingClientRect().width / 2 || 6,
+          muted: false,
+          shown: false,
+          depth: 0,
+          sx: 0,
+          sy: 0,
+          tx: 0,
+          ty: 0,
+          x: 0,
+          y: 0,
+        };
+      });
+
+      this.readColors();
+      // A theme switch changes the canvas colours, which only a redraw applies.
+      new MutationObserver(() => {
+        this.readColors();
+        this.kick();
+      }).observe(document.documentElement, {
+        attributes: true,
+        attributeFilter: ['data-theme'],
+      });
+
+      new ResizeObserver(() => this.resize()).observe(stage);
+      this.resize();
+      this.bind();
+
+      new IntersectionObserver((entries) => {
+        this.onScreen = entries[0].isIntersecting;
+        this.kick();
+      }).observe(this);
+      document.addEventListener('visibilitychange', () => this.kick());
+
+      this.kick();
+    }
+
+    private readColors() {
+      const styles = getComputedStyle(this);
+      const read = (name: string) => styles.getPropertyValue(name).trim();
+      this.colors = {
+        core: read('--globe-core'),
+        shell: read('--globe-shell'),
+        rim: read('--globe-rim'),
+        dot: read('--globe-dot'),
+        glow: read('--globe-glow'),
+        stick: read('--globe-stick'),
+      };
+    }
+
+    private resize() {
+      this.dpr = Math.min(2, window.devicePixelRatio || 1);
+      this.size = this.stage.clientWidth;
+      this.canvas.width = Math.round(this.size * this.dpr);
+      this.canvas.height = Math.round(this.size * this.dpr);
+      this.kick();
+    }
+
+    /** Rotates a unit vector into view space: [depth, right, up]. */
+    private rotate(v: readonly [number, number, number]): [number, number, number] {
+      const l = (this.lambda * Math.PI) / 180;
+      const p = (this.phi * Math.PI) / 180;
+      const x1 = v[0] * Math.cos(l) + v[1] * Math.sin(l);
+      const y1 = -v[0] * Math.sin(l) + v[1] * Math.cos(l);
+      return [x1 * Math.cos(p) + v[2] * Math.sin(p), y1, -x1 * Math.sin(p) + v[2] * Math.cos(p)];
+    }
+
+    /** Holds the auto-rotation for a while after an interaction. */
+    private nudge(ms: number) {
+      this.idleAt = performance.now() + ms;
+      this.kick();
+    }
+
+    /** Eases the rotation to a coordinate, taking the shorter way round. */
+    private spinTo(lng: number, lat: number, hold: number) {
+      const from = ((((this.lambda - lng) % 360) + 540) % 360) - 180 + lng;
+      this.lambda = from;
+      const target = { t0: performance.now(), l0: from, l1: lng, p0: this.phi, p1: Math.max(-30, Math.min(45, lat * 0.55)) };
+
+      if (this.reduced.matches) {
+        this.lambda = target.l1;
+        this.phi = target.p1;
+        this.anim = null;
+      } else {
+        this.anim = target;
+      }
+
+      this.nudge(hold);
+    }
+
+    /** Average direction of the given cities, so a year filter frames them all. */
+    private spinToAll(ids: Set<string> | null, hold: number) {
+      const shown = this.cities.filter((city) => !ids || ids.has(city.id));
+      if (shown.length === 0) return;
+
+      const sum = shown.reduce((acc, city) => [acc[0] + city.v[0], acc[1] + city.v[1], acc[2] + city.v[2]], [0, 0, 0]);
+      const length = Math.hypot(sum[0], sum[1], sum[2]);
+      // Cities on opposite sides of the planet cancel out - keep the current view.
+      if (length < 1e-6) return;
+
+      const lng = (Math.atan2(sum[1], sum[0]) * 180) / Math.PI;
+      const lat = (Math.asin(sum[2] / length) * 180) / Math.PI;
+      this.spinTo(lng, lat, hold);
+    }
+
+    // ── Public API, driven by the filters in Speaking.astro ──
+
+    /** Applies the current filter: which cities are on the globe, and which is picked. */
+    update(visibleIds: string[] | null, selectedId: string | null) {
+      const next = visibleIds === null ? null : new Set(visibleIds);
+      const sameSelection = selectedId === this.selected;
+      const sameVisible =
+        (next === null && this.visible === null) ||
+        (next !== null &&
+          this.visible !== null &&
+          next.size === this.visible.size &&
+          [...next].every((id) => this.visible!.has(id)));
+
+      this.visible = next;
+      this.selected = selectedId;
+
+      for (const city of this.cities) {
+        city.muted = next !== null && !next.has(city.id);
+        city.el.toggleAttribute('data-muted', city.muted);
+        city.el.tabIndex = city.muted ? -1 : 0;
+        city.el.setAttribute('aria-hidden', String(city.muted));
+        city.el.setAttribute('aria-pressed', String(city.id === selectedId));
+      }
+
+      if (sameSelection && sameVisible) return this.kick();
+
+      const picked = selectedId ? this.cities.find((city) => city.id === selectedId) : undefined;
+      if (picked) this.spinTo(picked.lng, picked.lat, 4000);
+      else this.spinToAll(next, 4000);
+    }
+
+    /** Lights up one city while its event card is hovered or focused. */
+    highlight(id: string | null) {
+      if (id === this.highlighted) return;
+      this.highlighted = id;
+
+      for (const city of this.cities) city.el.classList.toggle('is-highlighted', city.id === id);
+
+      const picked = id ? this.cities.find((city) => city.id === id) : undefined;
+      if (picked && !picked.muted) this.spinTo(picked.lng, picked.lat, 3000);
+      else this.nudge(1200);
+    }
+
+    // ── Interaction ──
+
+    private bind() {
+      this.stage.addEventListener('pointerenter', () => {
+        this.hovering = true;
+        this.kick();
+      });
+      this.stage.addEventListener('pointerleave', () => {
+        this.hovering = false;
+        this.nudge(1500);
+      });
+
+      this.stage.addEventListener('pointerdown', (event) => {
+        // Let the marker buttons handle their own clicks.
+        if ((event.target as HTMLElement).closest('.marker')) return;
+        this.drag = { x: event.clientX, y: event.clientY, l: this.lambda, p: this.phi, moved: false };
+        this.anim = null;
+        this.stage.classList.add('is-dragging');
+        this.stage.setPointerCapture(event.pointerId);
+        this.kick();
+      });
+
+      this.stage.addEventListener('pointermove', (event) => {
+        if (!this.drag) return;
+        const perPixel = 180 / (this.size * 0.9);
+        const dx = event.clientX - this.drag.x;
+        const dy = event.clientY - this.drag.y;
+        if (Math.abs(dx) + Math.abs(dy) > 3) this.drag.moved = true;
+        this.lambda = this.drag.l - dx * perPixel;
+        this.phi = Math.max(-60, Math.min(60, this.drag.p + dy * perPixel));
+      });
+
+      const release = () => {
+        if (!this.drag) return;
+        this.drag = null;
+        this.stage.classList.remove('is-dragging');
+        this.nudge(2500);
+      };
+      this.stage.addEventListener('pointerup', release);
+      this.stage.addEventListener('pointercancel', release);
+
+      for (const city of this.cities) {
+        city.el.addEventListener('click', () => {
+          this.dispatchEvent(new CustomEvent('place-select', { detail: city.id, bubbles: true }));
+        });
+        city.el.addEventListener('pointerenter', () => this.nudge(2500));
+        city.el.addEventListener('focus', () => {
+          this.spinTo(city.lng, city.lat, 4000);
+        });
+      }
+
+      this.reduced.addEventListener('change', () => this.kick());
+    }
+
+    // ── Render loop ──
+
+    private kick() {
+      if (!this.raf) this.raf = requestAnimationFrame((t) => this.frame(t));
+    }
+
+    private frame(now: number) {
+      this.raf = 0;
+      const dt = this.last ? Math.min(64, now - this.last) : 16;
+      this.last = now;
+      clearTimeout(this.wake);
+
+      if (this.anim) {
+        const k = Math.min(1, (now - this.anim.t0) / 900);
+        const ease = k < 0.5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2;
+        this.lambda = this.anim.l0 + (this.anim.l1 - this.anim.l0) * ease;
+        this.phi = this.anim.p0 + (this.anim.p1 - this.anim.p0) * ease;
+        if (k >= 1) this.anim = null;
+      } else if (this.spinning(now)) {
+        // ~3 degrees a second, framerate independent.
+        this.lambda -= 0.003 * dt;
+      }
+
+      this.lambda = ((((this.lambda % 360) + 540) % 360) - 180);
+      this.draw();
+
+      if (!this.onScreen || document.hidden) return;
+
+      if (this.anim || this.drag || this.spinning(now)) {
+        this.kick();
+        return;
+      }
+
+      // Nothing to animate right now. If the only thing holding the globe still
+      // is the interaction pause, set an alarm - otherwise the loop would stop
+      // for good and the globe would never pick its rotation back up.
+      if (!this.drag && !this.hovering && !this.reduced.matches && this.idleAt > now) {
+        clearTimeout(this.wake);
+        this.wake = window.setTimeout(() => this.kick(), this.idleAt - now + 32);
+      }
+    }
+
+    private spinning(now: number) {
+      return !this.drag && !this.hovering && !this.reduced.matches && now > this.idleAt;
+    }
+
+    private draw() {
+      const { ctx, size, dpr } = this;
+      const radius = size * 0.44;
+      const cx = size / 2;
+      const cy = size / 2;
+
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      ctx.clearRect(0, 0, size, size);
+
+      const glow = ctx.createRadialGradient(cx, cy, radius * 0.92, cx, cy, radius * 1.2);
+      glow.addColorStop(0, this.colors.glow);
+      glow.addColorStop(1, 'transparent');
+      ctx.fillStyle = glow;
+      ctx.beginPath();
+      ctx.arc(cx, cy, radius * 1.2, 0, Math.PI * 2);
+      ctx.fill();
+
+      const body = ctx.createRadialGradient(cx - radius * 0.35, cy - radius * 0.4, radius * 0.1, cx, cy, radius);
+      body.addColorStop(0, this.colors.core);
+      body.addColorStop(1, this.colors.shell);
+      ctx.fillStyle = body;
+      ctx.beginPath();
+      ctx.arc(cx, cy, radius, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.strokeStyle = this.colors.rim;
+      ctx.lineWidth = 1;
+      ctx.stroke();
+
+      const l = (this.lambda * Math.PI) / 180;
+      const p = (this.phi * Math.PI) / 180;
+      const cl = Math.cos(l);
+      const sl = Math.sin(l);
+      const cp = Math.cos(p);
+      const sp = Math.sin(p);
+
+      const dots = land!;
+      const d = Math.max(1.4, size / 300);
+      ctx.fillStyle = this.colors.dot;
+
+      for (let i = 0; i < dots.length; i += 3) {
+        const vx = dots[i];
+        const vy = dots[i + 1];
+        const vz = dots[i + 2];
+        const x1 = vx * cl + vy * sl;
+        const depth = x1 * cp + vz * sp;
+        if (depth <= 0.02) continue;
+        const right = -vx * sl + vy * cl;
+        const up = -x1 * sp + vz * cp;
+        ctx.globalAlpha = 0.2 + 0.75 * depth;
+        ctx.fillRect(cx + right * radius - d / 2, cy - up * radius - d / 2, d, d);
+      }
+      ctx.globalAlpha = 1;
+
+      this.layoutMarkers(cx, cy, radius);
+
+      ctx.strokeStyle = this.colors.stick;
+      ctx.lineWidth = 1.2;
+
+      for (const city of this.cities) {
+        const style = city.el.style;
+
+        if (!city.shown) {
+          style.opacity = '0';
+          style.pointerEvents = 'none';
+          continue;
+        }
+
+        const fade = Math.min(1, city.depth * 2.5);
+        ctx.globalAlpha = fade * 0.8;
+        ctx.beginPath();
+        ctx.moveTo(city.sx, city.sy);
+        ctx.lineTo(city.x, city.y);
+        ctx.stroke();
+
+        style.opacity = String(fade);
+        style.pointerEvents = 'auto';
+        style.transform = `translate3d(${city.x.toFixed(1)}px, ${city.y.toFixed(1)}px, 0) translate(-50%, -50%)`;
+        style.zIndex = String(10 + Math.round(city.depth * 50));
+        // Keep the tooltip inside the stage as the marker travels.
+        city.el.classList.toggle('align-start', city.x < size * 0.28);
+        city.el.classList.toggle('align-end', city.x > size * 0.72);
+      }
+
+      ctx.globalAlpha = 1;
+    }
+
+    /**
+     * Projects the cities, lifts them a little off the surface and pushes
+     * overlapping ones apart in screen space. Berlin, Frankfurt and Wroclaw are
+     * a handful of pixels apart on a globe this size, so without this they
+     * merge into a single unclickable blob. The relaxation runs from the same
+     * inputs every frame, so the result stays steady while the globe turns.
+     */
+    private layoutMarkers(cx: number, cy: number, radius: number) {
+      /** How far a marker floats above its city, in CSS pixels. */
+      const LIFT = 9;
+      /** Clear space between two marker edges. */
+      const GAP = 4;
+
+      const shown: City[] = [];
+
+      for (const city of this.cities) {
+        const [depth, right, up] = this.rotate(city.v);
+        city.depth = depth;
+        city.shown = depth > 0 && !city.muted;
+        if (!city.shown) continue;
+
+        city.sx = cx + right * radius;
+        city.sy = cy - up * radius;
+        // Float outwards from the centre of the disc, with a slight upward bias.
+        const lift = LIFT * depth;
+        city.tx = city.sx + right * lift * 0.6;
+        city.ty = city.sy - up * lift * 0.6 - lift * 0.4;
+        city.x = city.tx;
+        city.y = city.ty;
+        shown.push(city);
+      }
+
+      for (let pass = 0; pass < 20; pass += 1) {
+        for (let i = 0; i < shown.length; i += 1) {
+          for (let j = i + 1; j < shown.length; j += 1) {
+            const a = shown[i];
+            const b = shown[j];
+            const minDistance = a.r + b.r + GAP;
+            let dx = b.x - a.x;
+            let dy = b.y - a.y;
+            let distance = Math.hypot(dx, dy);
+            if (distance >= minDistance) continue;
+
+            // Identical positions would divide by zero - break the tie.
+            if (distance === 0) {
+              dx = 1;
+              dy = -1;
+              distance = Math.SQRT2;
+            }
+
+            const push = ((minDistance - distance) / distance) * 0.25;
+            a.x -= dx * push;
+            a.y -= dy * push;
+            b.x += dx * push;
+            b.y += dy * push;
+          }
+        }
+
+        // Weak spring back towards where the marker wants to sit.
+        for (const city of shown) {
+          city.x += (city.tx - city.x) * 0.05;
+          city.y += (city.ty - city.y) * 0.05;
+        }
+      }
+    }
+  }
+
+  customElements.define('speaking-globe', SpeakingGlobe);
+</script>
+
+<style>
+  speaking-globe {
+    --globe-core: #18243a;
+    --globe-shell: #0a0d13;
+    --globe-rim: rgba(154, 163, 178, 0.24);
+    --globe-dot: rgba(163, 174, 191, 0.95);
+    --globe-glow: rgba(77, 163, 255, 0.16);
+    --globe-stick: rgba(77, 163, 255, 0.55);
+
+    display: block;
+  }
+
+  :global([data-theme='light']) speaking-globe {
+    --globe-core: #ffffff;
+    --globe-shell: #e9eef6;
+    --globe-rim: rgba(91, 102, 117, 0.3);
+    --globe-dot: rgba(91, 102, 117, 0.8);
+    --globe-glow: rgba(11, 111, 216, 0.12);
+    --globe-stick: rgba(11, 111, 216, 0.5);
+  }
+
+  .stage {
+    position: relative;
+    aspect-ratio: 1;
+    width: 100%;
+    touch-action: pan-y;
+    cursor: grab;
+  }
+
+  .stage.is-dragging {
+    cursor: grabbing;
+  }
+
+  canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
+  .hint {
+    margin: 0.4rem 0 0;
+    font-size: 0.78rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    text-align: center;
+  }
+
+  /* --- Markers: positioned by the render loop, styled here --- */
+
+  .marker {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: var(--size);
+    height: var(--size);
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: none;
+    cursor: pointer;
+    outline-offset: 5px;
+    opacity: 0;
+  }
+
+  .marker[data-muted] {
+    pointer-events: none;
+  }
+
+  /* Keeps the small markers comfortably tappable. */
+  .marker::before {
+    content: '';
+    position: absolute;
+    inset: -9px;
+    border-radius: 50%;
+  }
+
+  .pin {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background: var(--accent-2);
+    box-shadow:
+      0 0 0 3px color-mix(in srgb, var(--accent-2) 20%, transparent),
+      0 0 14px color-mix(in srgb, var(--accent-2) 60%, transparent);
+    transition:
+      transform 0.2s ease,
+      background 0.2s ease,
+      box-shadow 0.2s ease;
+  }
+
+  .marker.upcoming .pin {
+    background: var(--accent);
+    animation: marker-pulse 2.4s ease-in-out infinite;
+  }
+
+  @keyframes marker-pulse {
+    0%,
+    100% {
+      box-shadow:
+        0 0 0 4px var(--accent-soft),
+        0 0 12px var(--accent);
+    }
+    50% {
+      box-shadow:
+        0 0 0 9px var(--accent-soft),
+        0 0 24px var(--accent);
+    }
+  }
+
+  .marker:hover .pin,
+  .marker:focus-visible .pin,
+  .marker[aria-pressed='true'] .pin {
+    transform: scale(1.35);
+  }
+
+  .marker[aria-pressed='true'] .pin,
+  .marker.is-highlighted .pin {
+    background: var(--accent);
+    box-shadow:
+      0 0 0 5px var(--accent-soft),
+      0 0 22px var(--accent);
+  }
+
+  .marker.is-highlighted .pin {
+    transform: scale(1.6);
+  }
+
+  /* Expanding ring, so the eye finds the marker without hunting for it. */
+  .marker.is-highlighted::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    border: 2px solid var(--accent);
+    animation: marker-ping 1.4s ease-out infinite;
+  }
+
+  @keyframes marker-ping {
+    0% {
+      opacity: 0.8;
+      transform: scale(1);
+    }
+    100% {
+      opacity: 0;
+      transform: scale(3.4);
+    }
+  }
+
+  /* --- Tooltip --- */
+
+  .tip {
+    position: absolute;
+    bottom: calc(100% + 10px);
+    left: 50%;
+    z-index: 4;
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+    width: max-content;
+    max-width: 13rem;
+    padding: 0.45rem 0.65rem;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: var(--bg-raised);
+    box-shadow: var(--shadow);
+    font-size: 0.75rem;
+    line-height: 1.45;
+    text-align: left;
+    color: var(--text-muted);
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transform: translateX(-50%);
+    transition:
+      opacity 0.18s ease,
+      visibility 0.18s;
+  }
+
+  .align-start .tip {
+    left: -8px;
+    transform: none;
+  }
+
+  .align-end .tip {
+    left: auto;
+    right: -8px;
+    transform: none;
+  }
+
+  .marker:hover .tip,
+  .marker:focus-visible .tip {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .tip-city {
+    font-weight: 700;
+    color: var(--text);
+  }
+
+  .tip-flag {
+    margin-right: 0.25rem;
+  }
+
+  .tip-event {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .tip-year {
+    margin-left: 0.4rem;
+    opacity: 0.7;
+  }
+</style>

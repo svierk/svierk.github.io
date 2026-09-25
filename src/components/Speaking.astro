@@ -1,10 +1,10 @@
 ---
+import Globe from './Globe.astro';
 import TalkCard from './TalkCard.astro';
-import WorldMap from './WorldMap.astro';
 import { talks } from '../data/talks';
 import type { Lang } from '../i18n/ui';
 import { useTranslations } from '../i18n/utils';
-import { buildSpeakingMap, isUpcoming, speakingStats } from '../lib/speaking';
+import { buildGlobeCities, isUpcoming, speakingStats } from '../lib/speaking';
 
 interface Props {
   lang: Lang;
@@ -14,14 +14,14 @@ const { lang } = Astro.props;
 const t = useTranslations(lang);
 
 /** How many events are visible before "show more" is pressed. */
-const PAGE_SIZE = 5;
+const PAGE_SIZE = 4;
 
 // The upcoming/past split is evaluated at build time; the weekly scheduled
 // rebuild keeps it (and the article list) fresh without manual updates.
 const today = new Date().toISOString().slice(0, 10);
 const sortedTalks = [...talks].sort((a, b) => b.date.localeCompare(a.date));
 const upcomingIds = new Set(sortedTalks.filter((talk) => isUpcoming(talk, today)).map((talk) => talk.id));
-const { markers, view } = buildSpeakingMap(talks, today);
+const cities = buildGlobeCities(talks, today);
 const stats = speakingStats(talks);
 
 const filters = [
@@ -33,97 +33,114 @@ const filters = [
 const hiddenCount = Math.max(sortedTalks.length - PAGE_SIZE, 0);
 ---
 
-<div data-speaking>
-  <dl class="stats">
-    <div class="stat">
-      <dt>{t('speaking.statEvents')}</dt>
-      <dd>{stats.events}</dd>
-    </div>
-    <div class="stat">
-      <dt>{t('speaking.statCountries')}</dt>
-      <dd>{stats.countries}</dd>
-    </div>
-    <div class="stat">
-      <dt>{t('speaking.statSessions')}</dt>
-      <dd>{stats.sessions}</dd>
-    </div>
-  </dl>
+<div class="speaking" data-speaking data-page-size={PAGE_SIZE}>
+  <div class="globe-col">
+    <dl class="stats">
+      <div class="stat">
+        <dt>{t('speaking.statEvents')}</dt>
+        <dd>{stats.events}</dd>
+      </div>
+      <div class="stat">
+        <dt>{t('speaking.statCountries')}</dt>
+        <dd>{stats.countries}</dd>
+      </div>
+      <div class="stat">
+        <dt>{t('speaking.statSessions')}</dt>
+        <dd>{stats.sessions}</dd>
+      </div>
+    </dl>
 
-  <WorldMap {markers} {view} {lang} />
+    <Globe {cities} {lang} />
 
-  <div class="filters" role="group" aria-label={t('speaking.filterLabel')}>
-    {
-      filters.map((filter) => (
-        <button type="button" class="filter-chip" data-filter={filter.key} aria-pressed={filter.key === 'all'}>
-          {filter.label}
-        </button>
-      ))
-    }
-    <button type="button" class="filter-chip place-chip" hidden>
-      <span class="place-label"></span>
-      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true">
-        <path d="M6 6l12 12M18 6 6 18"></path>
-      </svg>
-      <span class="sr-only">{t('speaking.clearFilter')}</span>
-    </button>
+    <div class="filters" role="group" aria-label={t('speaking.filterLabel')}>
+      {
+        filters.map((filter) => (
+          <button type="button" class="filter-chip" data-filter={filter.key} aria-pressed={filter.key === 'all'}>
+            {filter.label}
+          </button>
+        ))
+      }
+      <button type="button" class="filter-chip place-chip" hidden>
+        <span class="place-label"></span>
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true">
+          <path d="M6 6l12 12M18 6 6 18"></path>
+        </svg>
+        <span class="sr-only">{t('speaking.clearFilter')}</span>
+      </button>
+    </div>
   </div>
 
-  <ol class="timeline">
-    {
-      sortedTalks.map((talk, index) => (
-        <li
-          class:list={{ upcoming: upcomingIds.has(talk.id) }}
-          data-upcoming={String(upcomingIds.has(talk.id))}
-          data-year={talk.date.slice(0, 4)}
-          data-place={talk.place}
-          hidden={index >= PAGE_SIZE}
-        >
-          <TalkCard {talk} {lang} upcoming={upcomingIds.has(talk.id)} />
-        </li>
-      ))
-    }
-  </ol>
+  <div class="list-col">
+    <ol class="timeline">
+      {
+        sortedTalks.map((talk, index) => (
+          <li
+            class:list={{ upcoming: upcomingIds.has(talk.id) }}
+            data-upcoming={String(upcomingIds.has(talk.id))}
+            data-year={talk.date.slice(0, 4)}
+            data-place={talk.place}
+            hidden={index >= PAGE_SIZE}
+          >
+            <TalkCard {talk} {lang} upcoming={upcomingIds.has(talk.id)} />
+          </li>
+        ))
+      }
+    </ol>
 
-  <div class="pager">
-    <button type="button" class="pager-button" data-label={t('speaking.showMore')} hidden={hiddenCount === 0}>
-      <span class="pager-label">{`${t('speaking.showMore')} (${hiddenCount})`}</span>
-      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-        <path d="m6 9 6 6 6-6"></path>
+    <div class="pager">
+      <button type="button" class="pager-button" data-label={t('speaking.showMore')} hidden={hiddenCount === 0}>
+        <span class="pager-label">{`${t('speaking.showMore')} (${hiddenCount})`}</span>
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="m6 9 6 6 6-6"></path>
+        </svg>
+      </button>
+    </div>
+
+    <p class="meetups muted">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+        <circle cx="9" cy="7" r="4" />
+        <path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" />
       </svg>
-    </button>
+      <span>{t('speaking.meetups')}</span>
+    </p>
   </div>
-
-  <p class="muted meetups">{t('speaking.meetups')}</p>
-
-  <noscript>
-    <style is:inline>
-      /* Without JS the filters and the pager do nothing, so show every event. */
-      .timeline > li[hidden] {
-        display: block !important;
-      }
-
-      .filters,
-      .pager {
-        display: none !important;
-      }
-    </style>
-  </noscript>
 </div>
 
+<noscript>
+  <style is:inline>
+    /* Without JS the filters and the pager do nothing, so show every event. */
+    .timeline > li[hidden] {
+      display: block !important;
+    }
+
+    .filters,
+    .pager {
+      display: none !important;
+    }
+  </style>
+</noscript>
+
 <script>
-  const PAGE_SIZE = 5;
+  type GlobeElement = HTMLElement & {
+    update(visibleIds: string[] | null, selectedId: string | null): void;
+    highlight(id: string | null): void;
+  };
+
   const section = document.querySelector<HTMLElement>('[data-speaking]');
 
   if (section) {
+    // Kept in sync with the server-rendered initial state via the markup.
+    const PAGE_SIZE = Number(section.dataset.pageSize) || 4;
     const list = section.querySelector<HTMLOListElement>('.timeline')!;
     // `:scope >` matters - the talk cards carry their own <li> session lists.
     const items = [...list.querySelectorAll<HTMLLIElement>(':scope > li')];
     const chips = [...section.querySelectorAll<HTMLButtonElement>('.filter-chip')];
     const placeChip = section.querySelector<HTMLButtonElement>('.place-chip')!;
     const placeLabel = placeChip.querySelector<HTMLSpanElement>('.place-label')!;
-    const markers = [...section.querySelectorAll<HTMLButtonElement>('.marker')];
     const pager = section.querySelector<HTMLButtonElement>('.pager-button')!;
     const pagerLabel = pager.querySelector<HTMLSpanElement>('.pager-label')!;
+    const globe = section.querySelector<GlobeElement>('speaking-globe');
 
     /** 'all' | 'upcoming' | 'year:<yyyy>' | 'place:<id>' */
     let filter = 'all';
@@ -137,13 +154,14 @@ const hiddenCount = Math.max(sortedTalks.length - PAGE_SIZE, 0);
     };
 
     /**
-     * A year or upcoming filter thins out the map too; a city filter leaves
+     * A year or upcoming filter thins out the globe too; a city filter leaves
      * every marker in place so the next city stays one click away.
      */
-    const markerMatches = (marker: HTMLButtonElement) => {
-      if (filter === 'all' || filter.startsWith('place:')) return true;
-      if (filter === 'upcoming') return marker.dataset.upcoming === 'true';
-      return marker.dataset.years!.split(' ').includes(filter.split(':')[1]);
+    const globeState = (): [string[] | null, string | null] => {
+      if (filter.startsWith('place:')) return [null, filter.split(':')[1]];
+      if (filter === 'all') return [null, null];
+      const ids = new Set(items.filter((item) => matches(item)).map((item) => item.dataset.place!));
+      return [[...ids], null];
     };
 
     const render = () => {
@@ -161,20 +179,7 @@ const hiddenCount = Math.max(sortedTalks.length - PAGE_SIZE, 0);
       placeChip.hidden = !filter.startsWith('place:');
       for (const chip of chips) chip.setAttribute('aria-pressed', String(chip.dataset.filter === filter));
 
-      for (const marker of markers) {
-        marker.setAttribute('aria-pressed', String(`place:${marker.dataset.place}` === filter));
-        const muted = !markerMatches(marker);
-        marker.classList.toggle('is-muted', muted);
-        marker.tabIndex = muted ? -1 : 0;
-        marker.setAttribute('aria-hidden', String(muted));
-      }
-    };
-
-    /** Lights up the marker belonging to the event card under the cursor. */
-    const highlight = (place: string | null) => {
-      for (const marker of markers) {
-        marker.classList.toggle('is-highlighted', place !== null && marker.dataset.place === place);
-      }
+      globe?.update?.(...globeState());
     };
 
     const setFilter = (next: string) => {
@@ -190,30 +195,31 @@ const hiddenCount = Math.max(sortedTalks.length - PAGE_SIZE, 0);
 
     placeChip.addEventListener('click', () => setFilter('all'));
 
-    for (const marker of markers) {
-      marker.addEventListener('click', () => {
-        const key = `place:${marker.dataset.place}`;
-        if (filter === key) {
-          setFilter('all');
-          return;
-        }
-        placeChip.dataset.filter = key;
-        placeLabel.textContent = `${marker.dataset.flag} ${marker.dataset.city}`;
-        setFilter(key);
-        // On narrow screens the map fills the viewport - bring the result into view.
-        if (list.getBoundingClientRect().top > window.innerHeight * 0.75) {
-          list.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }
-      });
-    }
+    // Raised by the globe when one of its markers is activated.
+    globe?.addEventListener('place-select', (event) => {
+      const id = (event as CustomEvent<string>).detail;
+      const key = `place:${id}`;
+      if (filter === key) {
+        setFilter('all');
+        return;
+      }
+      placeChip.dataset.filter = key;
+      const marker = globe.querySelector<HTMLElement>(`.marker[data-place="${id}"]`);
+      placeLabel.textContent = `${marker?.dataset.flag ?? ''} ${marker?.dataset.city ?? ''}`.trim();
+      setFilter(key);
+      // On narrow screens the globe fills the viewport - bring the result into view.
+      if (list.getBoundingClientRect().top > window.innerHeight * 0.75) {
+        list.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    });
 
     for (const item of items) {
       const place = item.dataset.place ?? null;
-      item.addEventListener('mouseenter', () => highlight(place));
-      item.addEventListener('mouseleave', () => highlight(null));
+      item.addEventListener('mouseenter', () => globe?.highlight?.(place));
+      item.addEventListener('mouseleave', () => globe?.highlight?.(null));
       // Covers keyboard users tabbing through the links inside a card.
-      item.addEventListener('focusin', () => highlight(place));
-      item.addEventListener('focusout', () => highlight(null));
+      item.addEventListener('focusin', () => globe?.highlight?.(place));
+      item.addEventListener('focusout', () => globe?.highlight?.(null));
     }
 
     pager.addEventListener('click', () => {
@@ -225,16 +231,34 @@ const hiddenCount = Math.max(sortedTalks.length - PAGE_SIZE, 0);
     });
 
     render();
+    // The globe upgrades from its own module - hand it the state once it exists.
+    customElements.whenDefined('speaking-globe').then(() => globe?.update?.(...globeState()));
   }
 </script>
 
 <style>
+  .speaking {
+    display: grid;
+    grid-template-columns: minmax(0, 0.75fr) minmax(0, 1.25fr);
+    gap: 2.25rem;
+    align-items: start;
+  }
+
+  .globe-col {
+    position: sticky;
+    /* Clears the sticky header. */
+    top: 5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.1rem;
+  }
+
   .stats {
     display: grid;
     /* minmax(0, …) - otherwise a long label stretches the track past the page. */
     grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 1rem;
-    margin: 0 0 1.75rem;
+    gap: 0.6rem;
+    margin: 0;
   }
 
   .stat {
@@ -243,13 +267,13 @@ const hiddenCount = Math.max(sortedTalks.length - PAGE_SIZE, 0);
     flex-direction: column-reverse;
     border: 1px solid var(--border);
     border-radius: 14px;
-    padding: 0.85rem 1.1rem;
+    padding: 0.7rem 0.85rem;
     background: var(--bg-card);
   }
 
   .stat dd {
     margin: 0;
-    font-size: 1.9rem;
+    font-size: 1.7rem;
     font-weight: 700;
     line-height: 1.15;
     letter-spacing: -0.02em;
@@ -260,7 +284,7 @@ const hiddenCount = Math.max(sortedTalks.length - PAGE_SIZE, 0);
   }
 
   .stat dt {
-    font-size: 0.78rem;
+    font-size: 0.7rem;
     font-weight: 600;
     letter-spacing: 0.07em;
     text-transform: uppercase;
@@ -270,8 +294,9 @@ const hiddenCount = Math.max(sortedTalks.length - PAGE_SIZE, 0);
   .filters {
     display: flex;
     flex-wrap: wrap;
+    /* Centred under the globe, in line with the counters and the hint above. */
+    justify-content: center;
     gap: 0.5rem;
-    margin-bottom: 1.6rem;
   }
 
   .filter-chip {
@@ -323,17 +348,17 @@ const hiddenCount = Math.max(sortedTalks.length - PAGE_SIZE, 0);
     list-style: none;
     position: relative;
     margin: 0;
-    padding: 0 0 0 2rem;
+    padding: 0 0 0 1.5rem;
     display: flex;
     flex-direction: column;
-    gap: 0.9rem;
+    gap: 0.6rem;
   }
 
   /* Vertical gradient line connecting the events. */
   .timeline::before {
     content: '';
     position: absolute;
-    left: 0.45rem;
+    left: 0.2rem;
     top: 1.5rem;
     bottom: 1.5rem;
     width: 2px;
@@ -354,7 +379,7 @@ const hiddenCount = Math.max(sortedTalks.length - PAGE_SIZE, 0);
   .timeline > li::before {
     content: '';
     position: absolute;
-    left: -1.98rem;
+    left: -1.48rem;
     top: 1.55rem;
     width: 10px;
     height: 10px;
@@ -386,8 +411,8 @@ const hiddenCount = Math.max(sortedTalks.length - PAGE_SIZE, 0);
   }
 
   .pager {
-    margin-top: 1.25rem;
-    padding-left: 2rem;
+    margin-top: 1.1rem;
+    padding-left: 1.5rem;
   }
 
   .pager-button {
@@ -418,25 +443,45 @@ const hiddenCount = Math.max(sortedTalks.length - PAGE_SIZE, 0);
   }
 
   .meetups {
-    margin-top: 1.25rem;
-    font-size: 0.95rem;
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+    margin: 0.9rem 0 0;
+    padding-left: 1.5rem;
+    font-size: 0.85rem;
+  }
+
+  .meetups svg {
+    flex: none;
+    opacity: 0.8;
+  }
+
+  @media (max-width: 900px) {
+    .speaking {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 1.75rem;
+    }
+
+    .globe-col {
+      position: static;
+      /* Keeps the globe from dominating the page on a tablet. */
+      max-width: 26rem;
+      margin-inline: auto;
+      width: 100%;
+    }
   }
 
   @media (max-width: 720px) {
-    .stats {
-      gap: 0.6rem;
-    }
-
     .stat {
-      padding: 0.7rem 0.8rem;
+      padding: 0.6rem 0.7rem;
     }
 
     .stat dd {
-      font-size: 1.5rem;
+      font-size: 1.45rem;
     }
 
     .stat dt {
-      font-size: 0.68rem;
+      font-size: 0.66rem;
       letter-spacing: 0.05em;
     }
 
@@ -448,7 +493,8 @@ const hiddenCount = Math.max(sortedTalks.length - PAGE_SIZE, 0);
       left: -1.4rem;
     }
 
-    .pager {
+    .pager,
+    .meetups {
       padding-left: 1.4rem;
     }
   }
