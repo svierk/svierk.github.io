@@ -1,3 +1,28 @@
+export interface Place {
+  /** Short label shown on the world map and in the location filter. */
+  city: string;
+  country: string;
+  /** Country flag emoji shown next to the location. */
+  flag: string;
+  /** [longitude, latitude] of the venue, used to place the map marker. */
+  coords: [number, number];
+}
+
+/**
+ * Venues the talks below took place at. Events are grouped by place on the
+ * world map, so cities stay a single marker no matter how often they repeat.
+ */
+export const places = {
+  'san-francisco': { city: 'San Francisco', country: 'USA', flag: '🇺🇸', coords: [-122.42, 37.77] },
+  frankfurt: { city: 'Frankfurt', country: 'Germany', flag: '🇩🇪', coords: [8.65, 50.11] },
+  berlin: { city: 'Berlin', country: 'Germany', flag: '🇩🇪', coords: [13.43, 52.52] },
+  tirana: { city: 'Tirana', country: 'Albania', flag: '🇦🇱', coords: [19.82, 41.33] },
+  wroclaw: { city: 'Wrocław', country: 'Poland', flag: '🇵🇱', coords: [17.03, 51.11] },
+  london: { city: 'London', country: 'UK', flag: '🇬🇧', coords: [-0.13, 51.51] },
+} as const satisfies Record<string, Place>;
+
+export type PlaceId = keyof typeof places;
+
 export interface TalkSession {
   /** Session titles are proper names and stay in English in both languages. */
   title: string;
@@ -18,9 +43,9 @@ export interface Talk {
   date: string;
   /** Optional last event day for multi-day conferences. */
   dateEnd?: string;
+  /** Venue as shown on the card; the map marker comes from `place`. */
   location: string;
-  /** Country flag emoji shown next to the location. */
-  flag: string;
+  place: PlaceId;
   sessions: TalkSession[];
   /** True while the session details are not announced yet. */
   comingSoon?: boolean;
@@ -35,7 +60,7 @@ export const talks: Talk[] = [
     date: '2026-09-15',
     dateEnd: '2026-09-17',
     location: 'San Francisco, USA',
-    flag: '🇺🇸',
+    place: 'san-francisco',
     sessions: [
       {
         title: "An Architect's Guide to Prompt Engineering",
@@ -56,7 +81,7 @@ export const talks: Talk[] = [
     event: "Agentforce World Tour Frankfurt '26",
     date: '2026-05-20',
     location: 'Messe Frankfurt, Germany',
-    flag: '🇩🇪',
+    place: 'frankfurt',
     sessions: [
       {
         title: "How to fail Industry Cloud fast. Let's not.",
@@ -69,7 +94,7 @@ export const talks: Talk[] = [
     event: "WirSindOhana '26",
     date: '2026-05-08',
     location: 'Kosmos, Berlin, Germany',
-    flag: '🇩🇪',
+    place: 'berlin',
     sessions: [
       {
         title: 'Anti-Patterns in Agentforce - 5 Mistakes That Look Like Best Practices',
@@ -86,7 +111,7 @@ export const talks: Talk[] = [
     event: "Albania Dreamin '26",
     date: '2026-04-25',
     location: 'Pyramid of Tirana, Albania',
-    flag: '🇦🇱',
+    place: 'tirana',
     sessions: [
       {
         title: 'Diagnose a Monolithic Salesforce Org with Scale Center',
@@ -104,7 +129,7 @@ export const talks: Talk[] = [
     date: '2026-04-15',
     dateEnd: '2026-04-16',
     location: 'San Francisco, USA',
-    flag: '🇺🇸',
+    place: 'san-francisco',
     sessions: [
       {
         title: 'Automate UI Testing with AI and UTAM',
@@ -124,7 +149,7 @@ export const talks: Talk[] = [
     event: "Polish Dreamin '26",
     date: '2026-03-20',
     location: 'Wrocław, Poland',
-    flag: '🇵🇱',
+    place: 'wroclaw',
     sessions: [
       {
         title: 'From Scattered to Complete: Architecting a Real-World Customer 360 Use Case',
@@ -138,7 +163,7 @@ export const talks: Talk[] = [
     event: "DevOps Dreamin' London '25",
     date: '2025-11-20',
     location: 'London, UK',
-    flag: '🇬🇧',
+    place: 'london',
     sessions: [
       {
         title: 'Empowering Cross-Functional Teams with Scratch Orgs',
@@ -154,7 +179,7 @@ export const talks: Talk[] = [
     date: '2025-03-05',
     dateEnd: '2025-03-06',
     location: 'San Francisco, USA',
-    flag: '🇺🇸',
+    place: 'san-francisco',
     sessions: [
       {
         title: 'Streamline Salesforce E2E UI Testing with UTAM',
@@ -171,7 +196,7 @@ export const talks: Talk[] = [
     event: "WirSindOhana '24",
     date: '2024-05-24',
     location: 'Kosmos, Berlin, Germany',
-    flag: '🇩🇪',
+    place: 'berlin',
     sessions: [
       {
         title: '5 Things Salesforce Developers Should Know About Lightning Web Components',

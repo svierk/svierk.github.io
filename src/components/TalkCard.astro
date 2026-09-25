@@ -1,5 +1,5 @@
 ---
-import type { Talk } from '../data/talks';
+import { places, type Talk } from '../data/talks';
 import type { Lang } from '../i18n/ui';
 import { formatDate, useTranslations } from '../i18n/utils';
 
@@ -12,6 +12,7 @@ interface Props {
 const { talk, lang, upcoming } = Astro.props;
 const t = useTranslations(lang);
 
+const place = places[talk.place];
 const start = new Date(talk.date);
 const end = talk.dateEnd ? new Date(talk.dateEnd) : undefined;
 const dateLabel = end
@@ -33,7 +34,7 @@ const dateLabel = end
     {upcoming && <span class="chip">{t('speaking.upcoming')}</span>}
   </div>
   <p class="muted meta">
-    {dateLabel} · <span class="flag" aria-hidden="true">{talk.flag}</span> {talk.location}
+    {dateLabel} · <span class="flag" aria-hidden="true">{place.flag}</span> {talk.location}
   </p>
   {
     talk.comingSoon ? (

@@ -6,14 +6,13 @@ import Hero from './Hero.astro';
 import Nav from './Nav.astro';
 import ProjectCard from './ProjectCard.astro';
 import Section from './Section.astro';
-import TalkCard from './TalkCard.astro';
+import Speaking from './Speaking.astro';
 import VideoCard from './VideoCard.astro';
 import Base from '../layouts/Base.astro';
 import { profile } from '../data/profile';
 import { features } from '../data/featured';
 import { githubProfileUrl, projects } from '../data/projects';
 import { liveSessions } from '../data/sessions';
-import { talks } from '../data/talks';
 import type { Lang } from '../i18n/ui';
 import { useTranslations } from '../i18n/utils';
 import { fetchStarCounts } from '../lib/github';
@@ -28,12 +27,6 @@ const t = useTranslations(lang);
 
 const articles = await fetchMediumArticles(profile.mediumFeed);
 const starCounts = await fetchStarCounts(projects.map((project) => project.repo));
-
-// The upcoming/past split is evaluated at build time; the weekly scheduled
-// rebuild keeps it (and the article list) fresh without manual updates.
-const today = new Date().toISOString().slice(0, 10);
-const isUpcoming = (talk: (typeof talks)[number]) => (talk.dateEnd ?? talk.date) >= today;
-const sortedTalks = [...talks].sort((a, b) => b.date.localeCompare(a.date));
 ---
 
 <Base {lang}>
@@ -46,16 +39,7 @@ const sortedTalks = [...talks].sort((a, b) => b.date.localeCompare(a.date));
     </Section>
 
     <Section id="speaking" title={t('speaking.title')} subtitle={t('speaking.subtitle')}>
-      <ol class="timeline">
-        {
-          sortedTalks.map((talk) => (
-            <li class:list={{ upcoming: isUpcoming(talk) }}>
-              <TalkCard {talk} {lang} upcoming={isUpcoming(talk)} />
-            </li>
-          ))
-        }
-      </ol>
-      <p class="muted meetups">{t('speaking.meetups')}</p>
+      <Speaking {lang} />
     </Section>
 
     <Section id="sessions" title={t('sessions.title')} subtitle={t('sessions.subtitle')}>
@@ -90,67 +74,6 @@ const sortedTalks = [...talks].sort((a, b) => b.date.localeCompare(a.date));
   .about-body {
     max-width: 46rem;
     margin: 0;
-  }
-
-  .timeline {
-    list-style: none;
-    position: relative;
-    margin: 0;
-    padding: 0 0 0 2rem;
-    display: flex;
-    flex-direction: column;
-    gap: 0.9rem;
-  }
-
-  /* Vertical gradient line connecting the events. */
-  .timeline::before {
-    content: '';
-    position: absolute;
-    left: 0.45rem;
-    top: 1.5rem;
-    bottom: 1.5rem;
-    width: 2px;
-    border-radius: 2px;
-    background: linear-gradient(180deg, var(--accent), var(--accent-2) 60%, transparent);
-    opacity: 0.4;
-  }
-
-  .timeline > li {
-    position: relative;
-  }
-
-  /* Glowing dot per event. */
-  .timeline > li::before {
-    content: '';
-    position: absolute;
-    left: -1.98rem;
-    top: 1.55rem;
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-    background: var(--accent-2);
-    box-shadow: 0 0 10px var(--accent-glow);
-  }
-
-  .timeline > li.upcoming::before {
-    background: var(--accent);
-    box-shadow: 0 0 0 4px var(--accent-soft), 0 0 14px var(--accent);
-    animation: pulse 2.4s ease-in-out infinite;
-  }
-
-  @keyframes pulse {
-    0%,
-    100% {
-      box-shadow: 0 0 0 4px var(--accent-soft), 0 0 10px var(--accent);
-    }
-    50% {
-      box-shadow: 0 0 0 7px var(--accent-soft), 0 0 20px var(--accent);
-    }
-  }
-
-  .meetups {
-    margin-top: 1.25rem;
-    font-size: 0.95rem;
   }
 
   .view-all {
